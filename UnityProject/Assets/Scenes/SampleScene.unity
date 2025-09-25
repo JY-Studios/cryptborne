@@ -689,7 +689,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 1623100427540999979, guid: 95df14c81eae84716b6e51fcf3a5c777, type: 3}
   enemyCount: 5
-  spawnRadius: 4
+  roomBuilder: {fileID: 1664958383}
+  wallOffset: 1.5
 --- !u!4 &2023476734
 Transform:
   m_ObjectHideFlags: 0
