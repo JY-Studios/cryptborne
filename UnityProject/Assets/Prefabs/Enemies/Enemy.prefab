@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5221919655102002832}
   - component: {fileID: 8630517085004529533}
   - component: {fileID: 18040954402305545}
-  - component: {fileID: -5284062025408416824}
+  - component: {fileID: 7048759432550365179}
   - component: {fileID: -3013802375287924253}
   - component: {fileID: 7247052865305611073}
   m_Layer: 0
@@ -116,7 +116,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-5284062025408416824
+--- !u!114 &7048759432550365179
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,13 +125,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 1623100427540999979}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53f5b46ee9c9c4ca6931c38902c435db, type: 3}
+  m_Script: {fileID: 11500000, guid: 773b00d303894562901781e4360120c5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  m_EditorClassIdentifier: Assembly-CSharp::Enemies.EnemyStateManager
+  player: {fileID: 0}
+  controller: {fileID: 0}
+  health: {fileID: 0}
   moveSpeed: 2
   detectionRange: 8
   attackRange: 1.5
   separationRadius: 1
+  attackDamage: 1
+  attackCooldown: 1.5
+  nextAttackTime: 0
 --- !u!143 &-3013802375287924253
 CharacterController:
   m_ObjectHideFlags: 0
