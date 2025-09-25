@@ -633,9 +633,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30a440ec1c46e48f68ebc6e3e76bfa33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularRoomBuilder
-  wallModule: {fileID: 5925501330103133019, guid: ce033fee5ecb847a999680e9b0227e42, type: 3}
+  wallModule: {fileID: 3432845640479640443, guid: ce033fee5ecb847a999680e9b0227e42, type: 3}
   floorModule: {fileID: 6168866094691769559, guid: 58c7f2e1ed4044b2db074b7999f1fa61, type: 3}
-  cornerModule: {fileID: 5948625028740696982, guid: 801511ef5bdd44eb38854e6f3c96ebe9, type: 3}
+  cornerModule: {fileID: 7994417696834692595, guid: 801511ef5bdd44eb38854e6f3c96ebe9, type: 3}
+  doorModule: {fileID: 2093055578404243854, guid: 1c5bb660fbdbd4f429858f208e282abc, type: 3}
+  northDoor: 1
+  southDoor: 0
+  eastDoor: 0
+  westDoor: 0
   roomWidth: 10
   roomDepth: 10
 --- !u!4 &1664958384
@@ -647,7 +652,7 @@ Transform:
   m_GameObject: {fileID: 1664958382}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.94931, y: 0, z: 9.99999}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
