@@ -799,7 +799,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3aa08c79dc964926a8761ff9db17328, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerShoot
-  bulletPrefab: {fileID: 4233209234532055656, guid: f8c516981e7824d75b684d2712b50894, type: 3}
   firePoint: {fileID: 0}
   bulletSpeed: 20
   fireRate: 0.3
@@ -1001,8 +1000,8 @@ MonoBehaviour:
   floorModule: {fileID: 6168866094691769559, guid: 58c7f2e1ed4044b2db074b7999f1fa61, type: 3}
   cornerModule: {fileID: 7994417696834692595, guid: 801511ef5bdd44eb38854e6f3c96ebe9, type: 3}
   doorModule: {fileID: 2093055578404243854, guid: 1c5bb660fbdbd4f429858f208e282abc, type: 3}
-  northDoor: 0
-  southDoor: 1
+  northDoor: 1
+  southDoor: 0
   eastDoor: 0
   westDoor: 0
   roomWidth: 20
@@ -1017,6 +1016,60 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1841714455
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1841714457}
+  - component: {fileID: 1841714456}
+  m_Layer: 0
+  m_Name: PoolManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1841714456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841714455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5def234e738aa4b50b52529590edf6d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PoolManager
+  pools:
+  - poolName: Bullet
+    prefab: {fileID: 4233209234532055656, guid: f8c516981e7824d75b684d2712b50894, type: 3}
+    poolSize: 30
+  - poolName: Enemy
+    prefab: {fileID: 1623100427540999979, guid: 95df14c81eae84716b6e51fcf3a5c777, type: 3}
+    poolSize: 20
+  - poolName: Particle
+    prefab: {fileID: 0}
+    poolSize: 15
+--- !u!4 &1841714457
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841714455}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 421.5, y: 0, z: 403}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1051,7 +1104,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bceb68db7013045b19d99c8fbe85f995, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  enemyPrefab: {fileID: 1623100427540999979, guid: 95df14c81eae84716b6e51fcf3a5c777, type: 3}
   enemyCount: 5
   roomBuilder: {fileID: 1664958383}
   wallOffset: 1.5
@@ -1082,3 +1134,4 @@ SceneRoots:
   - {fileID: 2023476734}
   - {fileID: 448171637}
   - {fileID: 1070068308}
+  - {fileID: 1841714457}

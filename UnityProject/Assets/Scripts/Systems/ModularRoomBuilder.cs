@@ -31,7 +31,8 @@ public class ModularRoomBuilder : MonoBehaviour
             for (int z = 0; z < roomDepth; z++)
             {
                 Vector3 pos = new Vector3(x, 0, z);
-                Instantiate(floorModule, pos, Quaternion.identity, transform);
+                GameObject floor = Instantiate(floorModule, pos, Quaternion.identity, transform);
+                SetTagRecursive(floor, "Ground");
             }
         }
         
@@ -48,14 +49,14 @@ public class ModularRoomBuilder : MonoBehaviour
                 // Nur beim ERSTEN Tür-Segment spawnen
                 if (x == roomWidth/2 - 1 && doorModule != null)
                 {
-                    Instantiate(doorModule, pos, Quaternion.identity, transform);
+                    GameObject door = Instantiate(doorModule, pos, Quaternion.identity, transform);
+                    SetTagRecursive(door, "Wall");
                 }
-                // Beim zweiten Segment nichts tun
             }
             else
             {
-                // Normale Wand
-                Instantiate(wallModule, pos, Quaternion.identity, transform);
+                GameObject wall = Instantiate(wallModule, pos, Quaternion.identity, transform);
+                SetTagRecursive(wall, "Wall");
             }
         }
         
@@ -70,12 +71,14 @@ public class ModularRoomBuilder : MonoBehaviour
             {
                 if (x == roomWidth/2 - 1 && doorModule != null)
                 {
-                    Instantiate(doorModule, pos, Quaternion.identity, transform);
+                    GameObject door = Instantiate(doorModule, pos, Quaternion.identity, transform);
+                    SetTagRecursive(door, "Wall");
                 }
             }
             else
             {
-                Instantiate(wallModule, pos, Quaternion.identity, transform);
+                GameObject wall = Instantiate(wallModule, pos, Quaternion.identity, transform);
+                SetTagRecursive(wall, "Wall");
             }
         }
         
@@ -90,12 +93,14 @@ public class ModularRoomBuilder : MonoBehaviour
             {
                 if (z == roomDepth/2 - 1 && doorModule != null)
                 {
-                    Instantiate(doorModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                    GameObject door = Instantiate(doorModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                    SetTagRecursive(door, "Wall");
                 }
             }
             else
             {
-                Instantiate(wallModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                GameObject wall = Instantiate(wallModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                SetTagRecursive(wall, "Wall");
             }
         }
         
@@ -110,19 +115,36 @@ public class ModularRoomBuilder : MonoBehaviour
             {
                 if (z == roomDepth/2 - 1 && doorModule != null)
                 {
-                    Instantiate(doorModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                    GameObject door = Instantiate(doorModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                    SetTagRecursive(door, "Wall");
                 }
             }
             else
             {
-                Instantiate(wallModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                GameObject wall = Instantiate(wallModule, pos, Quaternion.Euler(0, 90, 0), transform);
+                SetTagRecursive(wall, "Wall");
             }
         }
         
         // ECKEN
-        Instantiate(cornerModule, new Vector3(-0.5f, 0, -0.5f), Quaternion.identity, transform);
-        Instantiate(cornerModule, new Vector3(roomWidth - 0.5f, 0, -0.5f), Quaternion.identity, transform);
-        Instantiate(cornerModule, new Vector3(-0.5f, 0, roomDepth - 0.5f), Quaternion.identity, transform);
-        Instantiate(cornerModule, new Vector3(roomWidth - 0.5f, 0, roomDepth - 0.5f), Quaternion.identity, transform);
+        GameObject corner1 = Instantiate(cornerModule, new Vector3(-0.5f, 0, -0.5f), Quaternion.identity, transform);
+        GameObject corner2 = Instantiate(cornerModule, new Vector3(roomWidth - 0.5f, 0, -0.5f), Quaternion.identity, transform);
+        GameObject corner3 = Instantiate(cornerModule, new Vector3(-0.5f, 0, roomDepth - 0.5f), Quaternion.identity, transform);
+        GameObject corner4 = Instantiate(cornerModule, new Vector3(roomWidth - 0.5f, 0, roomDepth - 0.5f), Quaternion.identity, transform);
+        
+        SetTagRecursive(corner1, "Wall");
+        SetTagRecursive(corner2, "Wall");
+        SetTagRecursive(corner3, "Wall");
+        SetTagRecursive(corner4, "Wall");
+    }
+    
+    // Setzt den Tag rekursiv auf das GameObject und alle seine Children
+    void SetTagRecursive(GameObject obj, string newTag)
+    {
+        obj.tag = newTag;
+        foreach (Transform child in obj.transform)
+        {
+            SetTagRecursive(child.gameObject, newTag);
+        }
     }
 }

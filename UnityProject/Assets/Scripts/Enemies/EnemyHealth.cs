@@ -16,13 +16,43 @@ public class EnemyHealth : MonoBehaviour
 
     void Start()
     {
+        Initialize();
+    }
+    
+    void OnEnable()
+    {
+        // Wird beim Pool-Recycling aufgerufen
+        Initialize();
+    }
+    
+    void Initialize()
+    {
         currentHealth = maxHealth;
 
-        enemyRenderer = GetComponent<Renderer>();
+        if (enemyRenderer == null)
+            enemyRenderer = GetComponent<Renderer>();
+            
         if (enemyRenderer != null)
-            originalColor = enemyRenderer.material.color;
+        {
+            if (originalColor == default(Color))
+                originalColor = enemyRenderer.material.color;
+            else
+                enemyRenderer.material.color = originalColor;
+        }
 
-        stateManager = GetComponent<EnemyStateManager>();
+        if (stateManager == null)
+            stateManager = GetComponent<EnemyStateManager>();
+    }
+    
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;
+        
+        if (enemyRenderer != null)
+        {
+            enemyRenderer.material.color = originalColor;
+            StopAllCoroutines();
+        }
     }
 
     public void TakeDamage(int damage)
@@ -41,16 +71,21 @@ public class EnemyHealth : MonoBehaviour
     {
         enemyRenderer.material.color = damageColor;
         yield return new WaitForSeconds(0.1f);
-        enemyRenderer.material.color = originalColor;
+        if (enemyRenderer != null)
+            enemyRenderer.material.color = originalColor;
     }
 
     void Die()
     {
         Debug.Log("Enemy died!");
-
         if (stateManager != null)
             stateManager.SwitchState(stateManager.deadState);
         else
-            Destroy(gameObject, 0.1f);
+            ReturnToPool();
+    }
+    
+    void ReturnToPool()
+    {
+        PoolManager.Instance.Despawn("Enemy", gameObject);
     }
 }
