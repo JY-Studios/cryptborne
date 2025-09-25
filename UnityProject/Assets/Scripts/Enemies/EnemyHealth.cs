@@ -7,7 +7,7 @@ public class EnemyHealth : MonoBehaviour
     public int currentHealth;
     
     [Header("Visual Feedback")]
-    public Color damageColor = Color.red;
+    public Color damageColor = Color.yellow;
     private Color originalColor;
     private Renderer enemyRenderer;
     
