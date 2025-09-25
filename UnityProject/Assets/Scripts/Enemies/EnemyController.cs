@@ -12,6 +12,12 @@ public class EnemyController : MonoBehaviour
     private CharacterController controller;
     private bool isChasing = false;
     
+    [Header("Combat")]
+    public int attackDamage = 1;
+    public float attackCooldown = 1.5f;
+    private float nextAttackTime = 0f;
+
+    
     void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -27,11 +33,18 @@ public class EnemyController : MonoBehaviour
     void Update()
     {
         if (player == null) return;
-        
+    
         float distance = Vector3.Distance(transform.position, player.position);
-        
+    
         if (distance <= detectionRange)
             isChasing = true;
+    
+        // Angriff wenn nah genug
+        if (distance <= attackRange && Time.time >= nextAttackTime)
+        {
+            Attack();
+            nextAttackTime = Time.time + attackCooldown;
+        }
         
         if (isChasing && distance > attackRange)
         {
@@ -76,5 +89,15 @@ public class EnemyController : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, detectionRange);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+    }
+    
+    void Attack()
+    {
+        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+        if (playerHealth != null)
+        {
+            playerHealth.TakeDamage(attackDamage);
+            Debug.Log("Enemy attacks player!");
+        }
     }
 }
