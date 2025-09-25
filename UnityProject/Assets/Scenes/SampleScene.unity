@@ -1001,8 +1001,8 @@ MonoBehaviour:
   floorModule: {fileID: 6168866094691769559, guid: 58c7f2e1ed4044b2db074b7999f1fa61, type: 3}
   cornerModule: {fileID: 7994417696834692595, guid: 801511ef5bdd44eb38854e6f3c96ebe9, type: 3}
   doorModule: {fileID: 2093055578404243854, guid: 1c5bb660fbdbd4f429858f208e282abc, type: 3}
-  northDoor: 1
-  southDoor: 0
+  northDoor: 0
+  southDoor: 1
   eastDoor: 0
   westDoor: 0
   roomWidth: 20
