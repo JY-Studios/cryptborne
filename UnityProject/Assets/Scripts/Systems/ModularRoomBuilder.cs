@@ -15,8 +15,8 @@ public class ModularRoomBuilder : MonoBehaviour
     public bool westDoor = false;
     
     [Header("Room Settings")]
-    public int roomWidth = 10;
-    public int roomDepth = 10;
+    public int roomWidth = 20;
+    public int roomDepth = 20;
     
     void Start()
     {

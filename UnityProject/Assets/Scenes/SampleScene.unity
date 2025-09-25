@@ -641,8 +641,8 @@ MonoBehaviour:
   southDoor: 0
   eastDoor: 0
   westDoor: 0
-  roomWidth: 10
-  roomDepth: 10
+  roomWidth: 20
+  roomDepth: 20
 --- !u!4 &1664958384
 Transform:
   m_ObjectHideFlags: 0
