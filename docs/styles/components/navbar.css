@@ -1,0 +1,132 @@
+/* Navbar */
+.navbar {
+    position: fixed;
+    top: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 100px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    transition: all 0.3s ease;
+}
+
+.navbar__indicator {
+    position: absolute;
+    border-radius: 50px;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 0;
+    pointer-events: none;
+    will-change: transform, width;
+    overflow: hidden;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.25) 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.25) 100%
+    );
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Dark Mode */
+.navbar--dark {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+/* Dark Mode Indicator */
+.navbar--dark .navbar__indicator {
+    background: linear-gradient(
+        135deg,
+        rgba(102, 126, 234, 0.2) 0%,
+        rgba(102, 126, 234, 0.1) 50%,
+        rgba(102, 126, 234, 0.2) 100%
+    );
+    border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.navbar__list {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.navbar__item {
+    position: relative;
+}
+
+/* Light Mode Links (Standard) */
+.navbar__link {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.navbar__link:hover {
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Active Link ohne Background (Indicator übernimmt das) */
+.navbar__link--active {
+    color: white;
+}
+
+/* Dark Mode Links */
+.navbar--dark .navbar__link {
+    color: #333;
+}
+
+.navbar--dark .navbar__link:hover {
+    color: #667eea;
+    transform: translateY(-2px);
+}
+
+.navbar--dark .navbar__link--active {
+    color: #667eea;
+}
+
+/* Mobile Anpassungen */
+@media screen and (max-width: 768px) {
+    .navbar {
+        top: 1rem;
+        padding: 0.5rem 0.75rem;
+        width: calc(100% - 2rem);
+        max-width: 400px;
+    }
+
+    .navbar__list {
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .navbar__link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    /* Hover-Effekt auf Mobile deaktivieren */
+    .navbar__link:hover {
+        transform: none;
+    }
+
+    /* Indicator auf Mobile anpassen */
+    .navbar__indicator {
+        border-radius: 25px;
+    }
+}

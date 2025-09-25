@@ -1,0 +1,312 @@
+/* home Section mit Liquid Glass Effect */
+.home {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.home__background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Floating Liquid Shapes */
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.6;
+    animation: float 20s infinite ease-in-out;
+    transform: translate3d(0, 0, 0);
+    animation-fill-mode: both;
+}
+
+.shape--1 {
+    width: 500px;
+    height: 500px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    top: -250px;
+    left: -250px;
+    animation-duration: 25s;
+}
+
+.shape--2 {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    bottom: 0;
+    right: 0;
+    transform: translate(50%, 50%);  /* Verschiebt um 50% nach außen */
+    animation-duration: 20s;
+    animation-delay: 5s;
+}
+
+.shape--3 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-duration: 30s;
+    animation-delay: 10s;
+}
+
+/* Glass Card */
+.home__content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 2rem;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 3rem 5rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    text-align: center;
+    width: 100%;
+    max-width: 1000px;
+    height: fit-content;
+    transition: transform 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px 0 rgba(31, 38, 135, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Home Inner Container für Layout */
+.home__inner {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Profilbild Styles */
+.home__image-wrapper {
+    flex: 0 0 auto;
+}
+
+.home__image-container {
+    position: relative;
+    width: 280px;
+    height: 280px;
+}
+
+.home__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 2;
+}
+
+/* Animierter Gradient-Rahmen bleibt gleich */
+.home__image-border {
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+    border-radius: 23px;
+    z-index: 1;
+    animation: gradient-rotation 4s linear infinite;
+    background-size: 300% 300%;
+}
+
+@keyframes gradient-rotation {
+    0% {
+        background-position: 0 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+/* Glass Card anpassen */
+.home__inner .glass-card {
+    flex: 1;
+}
+
+.home__title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.home__subtitle {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 300;
+}
+
+/* home Description */
+.home__description {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    margin: 1rem 0 2rem;
+    line-height: 1.6;
+}
+
+/* Social Links */
+.home__socials {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.social-icon {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Scroll Indicator */
+.home__scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+}
+
+.scroll-icon {
+    color: rgba(255, 255, 255, 0.6);
+    width: 32px;
+    height: 32px;
+}
+
+/* Mobile Anpassungen */
+@media screen and (max-width: 768px) {
+    .home__content {
+        padding: 1rem;
+    }
+
+    .home__inner {
+        flex-direction: column;
+        gap: 2rem;
+        padding-top: 2rem;
+        align-items: center;
+    }
+
+    .home__image-wrapper {
+        align-self: auto;
+    }
+
+    .home__image-container {
+        width: 180px;  /* Feste Größe auf Mobile */
+        height: 180px;
+        aspect-ratio: unset;
+        margin: 0 auto;
+    }
+
+    .glass-card {
+        padding: 2rem 1.5rem;
+        width: 100%;
+        max-width: none;
+    }
+
+    .home__title {
+        font-size: 2rem;
+    }
+
+    .home__subtitle {
+        font-size: 1.2rem;
+    }
+
+    .home__description {
+        font-size: 1rem;
+    }
+
+    /* Kleinere Shapes für Mobile */
+    .shape--1 {
+        width: 250px;
+        height: 250px;
+        top: -125px;
+        left: -125px;
+    }
+
+    .shape--2 {
+        width: 400px;
+        height: 400px;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        bottom: -100px;
+        right: -100px;
+        animation-duration: 20s;
+        animation-delay: 5s;
+    }
+
+    .shape--3 {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    40% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+        transform: translateX(-50%) translateY(-5px);
+    }
+}
+
+/* Float Animation */
+@keyframes float {
+    0%, 100% {
+        transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    25% {
+        transform: translate3d(100px, -100px, 0) rotate(90deg);
+    }
+    50% {
+        transform: translate3d(-100px, 100px, 0) rotate(180deg);
+    }
+    75% {
+        transform: translate3d(100px, 100px, 0) rotate(270deg);
+    }
+}

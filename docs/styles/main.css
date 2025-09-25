@@ -1,0 +1,16 @@
+/* Alle Styles importieren */
+@import 'base/reset.css';
+@import 'components/home.css';
+@import 'components/navbar.css';
+@import 'components/about.css';
+@import 'components/projects.css';
+@import 'components/contact.css';
+
+/* CSS Variablen für konsistentes Design */
+:root {
+    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --blur-amount: 10px;
+}

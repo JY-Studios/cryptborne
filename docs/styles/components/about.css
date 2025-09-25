@@ -1,0 +1,350 @@
+/* About Section */
+.about {
+    position: relative;
+    padding: 5rem 2rem;
+    background: linear-gradient(180deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(255, 255, 255, 0.95) 100%
+    );
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Background Shapes für About */
+.about__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.shape--6 {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0.4) 100%);
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.7;
+    top: 10%;
+    right: -225px;
+    animation: float 25s infinite ease-in-out;
+}
+
+.shape--7 {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.35) 0%, rgba(0, 242, 254, 0.35) 100%);
+    border-radius: 50%;
+    filter: blur(35px);
+    opacity: 0.7;
+    bottom: 20%;
+    left: -175px;
+    animation: float 30s infinite ease-in-out reverse;
+}
+
+.shape--8 {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.3) 0%, rgba(245, 87, 108, 0.3) 100%);
+    border-radius: 50%;
+    filter: blur(45px);
+    opacity: 0.7;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: float 35s infinite ease-in-out;
+}
+
+.about__container {
+    position: relative;
+    z-index: 1;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.section__title {
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about__content {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    gap: 2rem;
+}
+
+/* Einzelne Cards */
+.about__card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 2.5rem 3rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.about__card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px 0 rgba(31, 38, 135, 0.25);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.about__heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.about__icon {
+    width: 28px;
+    height: 28px;
+    color: #667eea;
+}
+
+/* Timeline für Bildung */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+}
+
+.timeline__item {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.timeline__item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline__item::before {
+    content: '';
+    position: absolute;
+    left: -2.4rem;
+    top: 0.5rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #667eea;
+    border: 2px solid white;
+}
+
+.timeline__date {
+    font-size: 0.9rem;
+    color: #667eea;
+    font-weight: 600;
+}
+
+.timeline__content h4 {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0.5rem 0 0.25rem;
+}
+
+.timeline__content p {
+    color: #666;
+    margin: 0;
+}
+
+.timeline__note {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #667eea;
+}
+
+/* Awards */
+.awards {
+    display: grid;
+    gap: 1rem;
+}
+
+.award {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.award:hover {
+    transform: translateX(5px);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.award__year {
+    font-weight: 600;
+    color: #667eea;
+    min-width: 80px;
+}
+
+.award__name {
+    color: #333;
+}
+
+/* Engagement */
+.engagement {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.engagement__item {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+}
+
+.engagement__icon {
+    width: 24px;
+    height: 24px;
+    color: #667eea;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+.engagement__item h4 {
+    font-size: 1.1rem;
+    color: #333;
+    margin: 0 0 0.25rem;
+}
+
+.engagement__item p {
+    color: #666;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Mobile Anpassungen */
+@media screen and (max-width: 768px) {
+    .about {
+        padding: 3rem 1rem;
+    }
+
+    .section__title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .about__content {
+        gap: 1.5rem;
+    }
+
+    .about__card {
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+
+    .about__heading {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .about__icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Timeline Anpassungen */
+    .timeline {
+        padding-left: 1.5rem;
+    }
+
+    .timeline__item::before {
+        left: -1.9rem;
+    }
+
+    .timeline__content h4 {
+        font-size: 1.1rem;
+    }
+
+    .timeline__content p {
+        font-size: 0.9rem;
+    }
+
+    .timeline__note {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.6rem;
+    }
+
+    /* Awards Anpassungen */
+    .award {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .award__year {
+        min-width: auto;
+        font-size: 0.9rem;
+    }
+
+    .award__name {
+        font-size: 0.95rem;
+    }
+
+    /* Engagement Anpassungen */
+    .engagement__item h4 {
+        font-size: 1rem;
+    }
+
+    .engagement__item p {
+        font-size: 0.9rem;
+    }
+
+    .engagement__icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Kleinere Shapes für Mobile */
+    .shape--6 {
+        width: 250px;
+        height: 250px;
+        right: -125px;
+    }
+
+    .shape--7 {
+        width: 200px;
+        height: 200px;
+        left: -100px;
+    }
+
+    .shape--8 {
+        width: 180px;
+        height: 180px;
+    }
+}
