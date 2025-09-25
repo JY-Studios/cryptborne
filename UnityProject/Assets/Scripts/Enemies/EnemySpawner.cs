@@ -5,25 +5,32 @@ public class EnemySpawner : MonoBehaviour
     [Header("Spawning")]
     public GameObject enemyPrefab;
     public int enemyCount = 5;
-    public float spawnRadius = 4f;
+    
+    [Header("Auto-Detect Room")]
+    public ModularRoomBuilder roomBuilder;
+    public float wallOffset = 1.5f; // Abstand zu Wänden
     
     void Start()
     {
+        if (roomBuilder == null)
+            roomBuilder = FindObjectOfType<ModularRoomBuilder>();
+            
         SpawnEnemies();
     }
     
     void SpawnEnemies()
     {
+        float roomWidth = roomBuilder ? roomBuilder.roomWidth : 10;
+        float roomDepth = roomBuilder ? roomBuilder.roomDepth : 10;
+        
         for(int i = 0; i < enemyCount; i++)
         {
-            // Zufällige Position im Raum
             Vector3 randomPos = new Vector3(
-                Random.Range(-spawnRadius, spawnRadius),
-                0.5f,  // Höhe für Enemy
-                Random.Range(-spawnRadius, spawnRadius)
+                Random.Range(wallOffset, roomWidth - wallOffset),
+                0.5f,
+                Random.Range(wallOffset, roomDepth - wallOffset)
             );
             
-            // Enemy spawnen
             Instantiate(enemyPrefab, randomPos, Quaternion.identity);
         }
     }

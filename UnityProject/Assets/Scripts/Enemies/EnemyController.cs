@@ -6,16 +6,22 @@ public class EnemyController : MonoBehaviour
     public float moveSpeed = 2f;
     public float detectionRange = 8f;
     public float attackRange = 1.5f;
+    public float separationRadius = 1f;
     
     private Transform player;
+    private CharacterController controller;
     private bool isChasing = false;
     
     void Start()
     {
-        // Finde den Player
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             player = playerObj.transform;
+            
+        // CharacterController statt Rigidbody
+        controller = GetComponent<CharacterController>();
+        if (controller == null)
+            controller = gameObject.AddComponent<CharacterController>();
     }
     
     void Update()
@@ -24,31 +30,50 @@ public class EnemyController : MonoBehaviour
         
         float distance = Vector3.Distance(transform.position, player.position);
         
-        // Spieler in Reichweite?
         if (distance <= detectionRange)
-        {
             isChasing = true;
-        }
         
-        // Verfolgen
         if (isChasing && distance > attackRange)
         {
             Vector3 direction = (player.position - transform.position).normalized;
-            direction.y = 0; // Nur auf X/Z Ebene bewegen
+            direction.y = 0;
             
-            transform.position += direction * moveSpeed * Time.deltaTime;
+            // Separation von anderen Enemies
+            Vector3 separation = GetSeparationVector();
             
-            // Gegner zum Player drehen
-            transform.LookAt(new Vector3(player.position.x, transform.position.y, player.position.z));
+            // Bewegung mit CharacterController
+            Vector3 movement = (direction + separation) * moveSpeed * Time.deltaTime;
+            controller.Move(movement);
+            
+            // Rotation
+            if (direction != Vector3.zero)
+                transform.rotation = Quaternion.LookRotation(direction);
         }
+    }
+    
+    Vector3 GetSeparationVector()
+    {
+        Vector3 separation = Vector3.zero;
+        Collider[] neighbors = Physics.OverlapSphere(transform.position, separationRadius);
+        
+        foreach (Collider other in neighbors)
+        {
+            if (other.gameObject != gameObject && other.CompareTag("Enemy"))
+            {
+                Vector3 diff = transform.position - other.transform.position;
+                diff.y = 0;
+                if (diff.magnitude > 0)
+                    separation += diff.normalized / diff.magnitude;
+            }
+        }
+        
+        return separation.normalized * 0.5f; // 0.5f = Separation Stärke
     }
     
     void OnDrawGizmosSelected()
     {
-        // Zeige Detection Range im Editor
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-        
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
