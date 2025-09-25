@@ -9,39 +9,45 @@ public class PlayerController : MonoBehaviour
     public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
     
-    private Rigidbody rb;
     private Vector2 moveInput;
     private bool isDashing;
     private bool canDash = true;
+    private CharacterController controller;
     
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | 
-                         RigidbodyConstraints.FreezeRotationZ;
+        // CharacterController statt Rigidbody verwenden
+        controller = GetComponent<CharacterController>();
+        if (controller == null)
+        {
+            controller = gameObject.AddComponent<CharacterController>();
+        }
     }
     
     void Update()
     {
-        // Neues Input System
-        moveInput = Keyboard.current.wKey.isPressed ? Vector2.up : Vector2.zero;
-        moveInput += Keyboard.current.sKey.isPressed ? Vector2.down : Vector2.zero;
-        moveInput += Keyboard.current.aKey.isPressed ? Vector2.left : Vector2.zero;
-        moveInput += Keyboard.current.dKey.isPressed ? Vector2.right : Vector2.zero;
-        moveInput.Normalize();
-        
-        // Dash auf Space
-        if (Keyboard.current.spaceKey.wasPressedThisFrame && canDash && !isDashing)
+        // Input
+        var keyboard = Keyboard.current;
+        if (keyboard != null)
         {
-            StartCoroutine(Dash());
+            Vector2 input = Vector2.zero;
+            if (keyboard.wKey.isPressed) input.y += 1;
+            if (keyboard.sKey.isPressed) input.y -= 1;
+            if (keyboard.aKey.isPressed) input.x -= 1;
+            if (keyboard.dKey.isPressed) input.x += 1;
+            moveInput = input.normalized;
+            
+            if (keyboard.spaceKey.wasPressedThisFrame && canDash && !isDashing)
+            {
+                StartCoroutine(Dash());
+            }
         }
-    }
-    
-    void FixedUpdate()
-    {
+        
+        // Bewegung direkt in Update für perfekte Synchronisation
         if (!isDashing)
         {
-            rb.linearVelocity = new Vector3(moveInput.x * moveSpeed, rb.linearVelocity.y, moveInput.y * moveSpeed);
+            Vector3 move = new Vector3(moveInput.x, 0, moveInput.y) * moveSpeed * Time.deltaTime;
+            controller.Move(move);
         }
     }
     
@@ -50,13 +56,16 @@ public class PlayerController : MonoBehaviour
         isDashing = true;
         canDash = false;
         
-        Vector3 dashVelocity = new Vector3(moveInput.x, 0, moveInput.y) * dashSpeed;
-        dashVelocity.y = rb.linearVelocity.y;
-        rb.linearVelocity = dashVelocity;
+        float elapsed = 0;
+        while (elapsed < dashDuration)
+        {
+            Vector3 dashMove = new Vector3(moveInput.x, 0, moveInput.y) * dashSpeed * Time.deltaTime;
+            controller.Move(dashMove);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
         
-        yield return new WaitForSeconds(dashDuration);
         isDashing = false;
-        
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
     }

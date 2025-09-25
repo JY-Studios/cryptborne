@@ -6,15 +6,15 @@ public class CameraController : MonoBehaviour
     public float smoothSpeed = 0.125f;
     public Vector3 offset = new Vector3(0, 5, -10);
     
+    private Vector3 velocity = Vector3.zero;
+    
     void LateUpdate()
     {
         if (target != null)
         {
             Vector3 desiredPosition = target.position + offset;
-            // Y-Position begrenzen falls was schief geht
-            desiredPosition.y = Mathf.Clamp(desiredPosition.y, 0f, 20f);
-            Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
-            transform.position = smoothedPosition;
+            // SmoothDamp ist besser als Lerp für Kamera-Bewegung
+            transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, smoothSpeed);
         }
     }
 }
