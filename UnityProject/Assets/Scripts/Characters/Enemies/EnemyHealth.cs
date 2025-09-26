@@ -2,14 +2,15 @@ using UnityEngine;
 
 namespace Characters.Enemies
 {
+    using Enemies;
+    using UnityEngine;
+
     public class EnemyHealth : MonoBehaviour
     {
-        [Header("Health")]
-        public float maxHealth = 2;
+        [Header("Health")] public int maxHealth = 2;
         public float currentHealth;
 
-        [Header("Visual Feedback")]
-        public Color damageColor = Color.yellow;
+        [Header("Visual Feedback")] public Color damageColor = Color.yellow;
         private Color originalColor;
         private Renderer enemyRenderer;
 
@@ -17,13 +18,43 @@ namespace Characters.Enemies
 
         void Start()
         {
+            Initialize();
+        }
+
+        void OnEnable()
+        {
+            // Wird beim Pool-Recycling aufgerufen
+            Initialize();
+        }
+
+        void Initialize()
+        {
             currentHealth = maxHealth;
 
-            enemyRenderer = GetComponent<Renderer>();
-            if (enemyRenderer != null)
-                originalColor = enemyRenderer.material.color;
+            if (enemyRenderer == null)
+                enemyRenderer = GetComponent<Renderer>();
 
-            stateManager = GetComponent<EnemyStateManager>();
+            if (enemyRenderer != null)
+            {
+                if (originalColor == default(Color))
+                    originalColor = enemyRenderer.material.color;
+                else
+                    enemyRenderer.material.color = originalColor;
+            }
+
+            if (stateManager == null)
+                stateManager = GetComponent<EnemyStateManager>();
+        }
+
+        public void ResetHealth()
+        {
+            currentHealth = maxHealth;
+
+            if (enemyRenderer != null)
+            {
+                enemyRenderer.material.color = originalColor;
+                StopAllCoroutines();
+            }
         }
 
         public void TakeDamage(float damage)
@@ -42,17 +73,22 @@ namespace Characters.Enemies
         {
             enemyRenderer.material.color = damageColor;
             yield return new WaitForSeconds(0.1f);
-            enemyRenderer.material.color = originalColor;
+            if (enemyRenderer != null)
+                enemyRenderer.material.color = originalColor;
         }
 
         void Die()
         {
             Debug.Log("Enemy died!");
-
             if (stateManager != null)
                 stateManager.SwitchState(stateManager.deadState);
             else
-                Destroy(gameObject, 0.1f);
+                ReturnToPool();
+        }
+
+        void ReturnToPool()
+        {
+            PoolManager.Instance.Despawn("Enemy", gameObject);
         }
     }
 }

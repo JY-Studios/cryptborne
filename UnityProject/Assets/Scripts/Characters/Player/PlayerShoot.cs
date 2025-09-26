@@ -3,9 +3,12 @@ using UnityEngine.InputSystem;
 
 namespace Characters.Player
 {
+    using UnityEngine;
+    using UnityEngine.InputSystem;
+
     public class PlayerShoot : MonoBehaviour
     {
-        [Header("Shooting")] public GameObject bulletPrefab;
+        [Header("Shooting")]
         public Transform firePoint;
         public float bulletSpeed = 20f;
         public float fireRate = 0.3f;
@@ -23,18 +26,23 @@ namespace Characters.Player
 
         void Shoot()
         {
-            if (bulletPrefab == null) return;
-
-            Vector3 spawnPos = firePoint ? firePoint.position : transform.position + Vector3.forward;
-            GameObject bullet = Instantiate(bulletPrefab, spawnPos, transform.rotation);
+            Vector3 spawnPos = firePoint ? firePoint.position : transform.position + transform.forward;
         
+            // Bullet vom PoolManager holen
+            GameObject bullet = PoolManager.Instance.Spawn("Bullet", spawnPos, transform.rotation);
+        
+            if (bullet == null)
+            {
+                Debug.LogWarning("Could not spawn bullet from pool!");
+                return;
+            }
+        
+            // Geschwindigkeit setzen
             Rigidbody rb = bullet.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.linearVelocity = transform.forward * bulletSpeed;
             }
-
-            Destroy(bullet, 2f);
         }
     }
 }

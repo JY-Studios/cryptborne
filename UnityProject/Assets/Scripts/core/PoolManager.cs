@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Characters.Enemies;
 using UnityEngine;
 
 [System.Serializable]
@@ -206,7 +207,7 @@ public class PoolManager : MonoBehaviour
                 if (health != null) health.ResetHealth();
             
                 // Enemy State reset - OHNE Position zu ändern!
-                Enemies.EnemyStateManager stateManager = obj.GetComponent<Enemies.EnemyStateManager>();
+                EnemyStateManager stateManager = obj.GetComponent<EnemyStateManager>();
                 if (stateManager != null) stateManager.ResetEnemy();
                 break;
             

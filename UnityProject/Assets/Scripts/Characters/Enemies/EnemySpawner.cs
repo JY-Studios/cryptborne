@@ -2,10 +2,11 @@ using UnityEngine;
 
 namespace Characters.Enemies
 {
+    using UnityEngine;
+
     public class EnemySpawner : MonoBehaviour
     {
         [Header("Spawning")]
-        public GameObject enemyPrefab;
         public int enemyCount = 5;
     
         [Header("Auto-Detect Room")]
@@ -33,8 +34,21 @@ namespace Characters.Enemies
                     Random.Range(wallOffset, roomDepth - wallOffset)
                 );
             
-                Instantiate(enemyPrefab, randomPos, Quaternion.identity);
+                GameObject enemy = PoolManager.Instance.Spawn("Enemy", randomPos, Quaternion.identity);
+            
+                if (enemy == null)
+                {
+                    Debug.LogWarning($"Could not spawn enemy {i+1}/{enemyCount}");
+                }
             }
+        
+            Debug.Log($"Spawned {enemyCount} enemies");
+        }
+    
+        // Alle Enemies entfernen
+        public void ClearAllEnemies()
+        {
+            PoolManager.Instance.DespawnAll("Enemy");
         }
     }
 }
