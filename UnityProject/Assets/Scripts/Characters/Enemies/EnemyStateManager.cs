@@ -1,7 +1,7 @@
-using Enemies.States;
+using Characters.Enemies.States;
 using UnityEngine;
 
-namespace Enemies
+namespace Characters.Enemies
 {
     public class EnemyStateManager : MonoBehaviour
     {

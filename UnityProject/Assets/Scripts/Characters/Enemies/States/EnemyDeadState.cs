@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Enemies.States
+namespace Characters.Enemies.States
 {
     public class EnemyDeadState : EnemyBaseState
     {

@@ -1,3 +1,4 @@
+using Characters.Enemies;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour

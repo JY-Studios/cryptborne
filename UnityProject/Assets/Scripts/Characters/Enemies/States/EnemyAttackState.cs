@@ -1,6 +1,7 @@
+using Characters.Player;
 using UnityEngine;
 
-namespace Enemies.States
+namespace Characters.Enemies.States
 {
     public class EnemyAttackState : EnemyBaseState
     {

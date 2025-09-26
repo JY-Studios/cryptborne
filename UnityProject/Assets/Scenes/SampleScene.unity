@@ -762,6 +762,7 @@ MonoBehaviour:
   dashSpeed: 15
   dashDuration: 0.2
   dashCooldown: 1
+  WeaponData: {fileID: 11400000, guid: 3397267e457c6c34090a11672bef7d78, type: 2}
 --- !u!143 &1238952121
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1070,6 +1071,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6711290608861794485
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.82
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.429
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5538041276597725413, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8484356968841289812, guid: 46de8296a619d6645a3612873778dac9, type: 3}
+      propertyPath: m_Name
+      value: Cylinder
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 46de8296a619d6645a3612873778dac9, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1082,3 +1140,4 @@ SceneRoots:
   - {fileID: 2023476734}
   - {fileID: 448171637}
   - {fileID: 1070068308}
+  - {fileID: 6711290608861794485}
