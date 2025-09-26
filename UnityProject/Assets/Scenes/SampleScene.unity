@@ -799,10 +799,11 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a3aa08c79dc964926a8761ff9db17328, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerShoot
+  m_EditorClassIdentifier: Assembly-CSharp::Characters.Player.PlayerShoot
   firePoint: {fileID: 0}
   bulletSpeed: 20
-  fireRate: 0.3
+  shootInterval: 2
+  detectionRange: 8
 --- !u!114 &1238952123
 MonoBehaviour:
   m_ObjectHideFlags: 0
