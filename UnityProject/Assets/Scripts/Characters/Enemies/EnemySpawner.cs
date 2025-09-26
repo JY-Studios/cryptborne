@@ -1,54 +1,258 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
+using TMPro;
 
 namespace Characters.Enemies
 {
-    using UnityEngine;
-
     public class EnemySpawner : MonoBehaviour
     {
-        [Header("Spawning")]
-        public int enemyCount = 5;
-    
+        [Header("Wave Settings")]
+        public int startingEnemies = 5; // Enemies in Wave 1
+        public int enemiesIncreasePerWave = 1; // Wie viele mehr pro Wave
+        public float timeBetweenWaves = 5f; // Pause zwischen Waves
+        public float spawnDelay = 0.3f; // Delay zwischen einzelnen Spawns
+        
+        [Header("Current Wave Info")]
+        [SerializeField] private int currentWave = 0;
+        [SerializeField] private int enemiesInCurrentWave = 0;
+        [SerializeField] private int enemiesAlive = 0;
+        [SerializeField] private bool waveInProgress = false;
+        
+        [Header("UI References")]
+        public TextMeshProUGUI waveText;
+        public TextMeshProUGUI enemiesRemainingText;
+        public GameObject waveCompletePanel;
+        
         [Header("Auto-Detect Room")]
         public ModularRoomBuilder roomBuilder;
-        public float wallOffset = 1.5f; // Abstand zu Wänden
-    
+        public float wallOffset = 1.5f;
+        
+        // Events für andere Systeme
+        public delegate void WaveEvent(int waveNumber);
+        public static event WaveEvent OnWaveStart;
+        public static event WaveEvent OnWaveComplete;
+        
+        private List<GameObject> activeEnemies = new List<GameObject>();
+        
         void Start()
         {
             if (roomBuilder == null)
                 roomBuilder = FindObjectOfType<ModularRoomBuilder>();
             
-            SpawnEnemies();
+            // UI initial verstecken
+            if (waveCompletePanel != null)
+                waveCompletePanel.SetActive(false);
+            
+            // Erste Wave starten
+            StartCoroutine(StartNextWaveWithDelay(2f));
         }
-    
-        void SpawnEnemies()
+        
+        void Update()
         {
+            // Prüfe ob Wave abgeschlossen ist
+            if (waveInProgress)
+            {
+                // Entferne null/zerstörte Enemies aus Liste
+                activeEnemies.RemoveAll(enemy => enemy == null || !enemy.activeInHierarchy);
+                enemiesAlive = activeEnemies.Count;
+                
+                UpdateUI();
+                
+                // Wenn alle Enemies tot sind, Wave beenden
+                if (enemiesAlive == 0)
+                {
+                    CompleteWave();
+                }
+            }
+        }
+        
+        void CompleteWave()
+        {
+            waveInProgress = false;
+            Debug.Log($"Wave {currentWave} complete!");
+            
+            // Event auslösen
+            OnWaveComplete?.Invoke(currentWave);
+            
+            // UI Update
+            if (waveCompletePanel != null)
+            {
+                waveCompletePanel.SetActive(true);
+                StartCoroutine(HideWaveCompletePanel());
+            }
+            
+            // Nächste Wave starten
+            StartCoroutine(StartNextWaveWithDelay(timeBetweenWaves));
+        }
+        
+        IEnumerator HideWaveCompletePanel()
+        {
+            yield return new WaitForSeconds(2f);
+            if (waveCompletePanel != null)
+                waveCompletePanel.SetActive(false);
+        }
+        
+        IEnumerator StartNextWaveWithDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            StartNextWave();
+        }
+        
+        public void StartNextWave()
+        {
+            currentWave++;
+            enemiesInCurrentWave = startingEnemies + (enemiesIncreasePerWave * (currentWave - 1));
+            waveInProgress = true;
+            
+            Debug.Log($"Starting Wave {currentWave} with {enemiesInCurrentWave} enemies");
+            
+            // Event auslösen
+            OnWaveStart?.Invoke(currentWave);
+            
+            // Enemies spawnen
+            StartCoroutine(SpawnWaveEnemies());
+            
+            UpdateUI();
+        }
+        
+        IEnumerator SpawnWaveEnemies()
+        {
+            activeEnemies.Clear();
+            
             float roomWidth = roomBuilder ? roomBuilder.roomWidth : 10;
             float roomDepth = roomBuilder ? roomBuilder.roomDepth : 10;
-        
-            for(int i = 0; i < enemyCount; i++)
+            
+            for(int i = 0; i < enemiesInCurrentWave; i++)
             {
-                Vector3 randomPos = new Vector3(
+                Vector3 randomPos = GetRandomSpawnPosition(roomWidth, roomDepth);
+                
+                // Spawn mit coolem Effekt
+                GameObject enemy = PoolManager.Instance.Spawn("Enemy", randomPos, Quaternion.identity);
+                
+                if (enemy != null)
+                {
+                    activeEnemies.Add(enemy);
+                    
+                    // Spawn Animation/Effekt
+                    AddSpawnEffect(enemy);
+                }
+                else
+                {
+                    Debug.LogWarning($"Could not spawn enemy {i+1}/{enemiesInCurrentWave}");
+                }
+                
+                // Kleine Pause zwischen Spawns für dramatischen Effekt
+                yield return new WaitForSeconds(spawnDelay);
+            }
+            
+            enemiesAlive = activeEnemies.Count;
+            Debug.Log($"Wave {currentWave}: Spawned {enemiesAlive} enemies");
+        }
+        
+        Vector3 GetRandomSpawnPosition(float roomWidth, float roomDepth)
+        {
+            // Zufällige Position mit mehr Variation
+            Vector3 randomPos;
+            
+            // 50% Chance für Spawn am Rand (dramatischer)
+            if (Random.value > 0.5f)
+            {
+                // Spawn am Rand
+                float edge = Random.Range(0, 4);
+                switch((int)edge)
+                {
+                    case 0: // Links
+                        randomPos = new Vector3(wallOffset, 0.5f, Random.Range(wallOffset, roomDepth - wallOffset));
+                        break;
+                    case 1: // Rechts
+                        randomPos = new Vector3(roomWidth - wallOffset, 0.5f, Random.Range(wallOffset, roomDepth - wallOffset));
+                        break;
+                    case 2: // Oben
+                        randomPos = new Vector3(Random.Range(wallOffset, roomWidth - wallOffset), 0.5f, roomDepth - wallOffset);
+                        break;
+                    default: // Unten
+                        randomPos = new Vector3(Random.Range(wallOffset, roomWidth - wallOffset), 0.5f, wallOffset);
+                        break;
+                }
+            }
+            else
+            {
+                // Zufällig im Raum
+                randomPos = new Vector3(
                     Random.Range(wallOffset, roomWidth - wallOffset),
                     0.5f,
                     Random.Range(wallOffset, roomDepth - wallOffset)
                 );
-            
-                GameObject enemy = PoolManager.Instance.Spawn("Enemy", randomPos, Quaternion.identity);
-            
-                if (enemy == null)
-                {
-                    Debug.LogWarning($"Could not spawn enemy {i+1}/{enemyCount}");
-                }
             }
-        
-            Debug.Log($"Spawned {enemyCount} enemies");
+            
+            return randomPos;
         }
-    
+        
+        void AddSpawnEffect(GameObject enemy)
+        {
+            // Scale Animation für Spawn
+            enemy.transform.localScale = Vector3.zero;
+            StartCoroutine(ScaleIn(enemy.transform));
+            
+            // Particle Effect spawnen
+            // GameObject spawnVFX = PoolManager.Instance.Spawn("SpawnVFX", enemy.transform.position, Quaternion.identity);
+        }
+        
+        IEnumerator ScaleIn(Transform enemyTransform)
+        {
+            float duration = 0.3f;
+            float elapsed = 0;
+            
+            while (elapsed < duration && enemyTransform != null)
+            {
+                elapsed += Time.deltaTime;
+                float scale = Mathf.Lerp(0, 1, elapsed / duration);
+                enemyTransform.localScale = Vector3.one * scale;
+                yield return null;
+            }
+            
+            if (enemyTransform != null)
+                enemyTransform.localScale = Vector3.one;
+        }
+        
+        void UpdateUI()
+        {
+            if (waveText != null)
+            {
+                waveText.text = $"Wave {currentWave}";
+            }
+            
+            if (enemiesRemainingText != null)
+            {
+                enemiesRemainingText.text = $"Enemies: {enemiesAlive}/{enemiesInCurrentWave}";
+            }
+        }
+        
+        // Manueller Wave Skip (für Testing)
+        [ContextMenu("Skip to Next Wave")]
+        public void SkipToNextWave()
+        {
+            ClearAllEnemies();
+            CompleteWave();
+        }
+        
         // Alle Enemies entfernen
         public void ClearAllEnemies()
         {
-            PoolManager.Instance.DespawnAll("Enemy");
+            foreach(var enemy in activeEnemies)
+            {
+                if (enemy != null)
+                    PoolManager.Instance.Despawn("Enemy", enemy);
+            }
+            activeEnemies.Clear();
+            enemiesAlive = 0;
         }
+        
+        // Wave Info für andere Systeme
+        public int GetCurrentWave() => currentWave;
+        public int GetEnemiesRemaining() => enemiesAlive;
+        public bool IsWaveInProgress() => waveInProgress;
     }
 }
