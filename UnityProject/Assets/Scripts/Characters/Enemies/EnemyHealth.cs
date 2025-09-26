@@ -1,20 +1,23 @@
 using UnityEngine;
+using Core.Events;
 
 namespace Characters.Enemies
 {
-    using Enemies;
-    using UnityEngine;
-
     public class EnemyHealth : MonoBehaviour
     {
-        [Header("Health")] public int maxHealth = 2;
+        [Header("Health")] 
+        public int maxHealth = 2;
         public float currentHealth;
 
-        [Header("Visual Feedback")] public Color damageColor = Color.yellow;
+        [Header("Visual Feedback")] 
+        public Color damageColor = Color.yellow;
         private Color originalColor;
         private Renderer enemyRenderer;
 
         private EnemyStateManager stateManager;
+        
+        // Constants
+        private const float DAMAGE_FLASH_DURATION = 0.1f;
 
         void Start()
         {
@@ -59,8 +62,15 @@ namespace Characters.Enemies
 
         public void TakeDamage(float damage)
         {
+            if (currentHealth <= 0) return; // Bereits tot
+            
             currentHealth -= damage;
-            Debug.Log($"Enemy hit! Health: {currentHealth}/{maxHealth}");
+            currentHealth = Mathf.Max(0, currentHealth);
+            
+            Debug.Log($"Enemy {gameObject.name} hit! Health: {currentHealth}/{maxHealth}");
+            
+            // Event auslösen
+            GameEvents.EnemyDamaged(gameObject, damage);
 
             if (enemyRenderer != null)
                 StartCoroutine(DamageFlash());
@@ -71,24 +81,41 @@ namespace Characters.Enemies
 
         System.Collections.IEnumerator DamageFlash()
         {
-            enemyRenderer.material.color = damageColor;
-            yield return new WaitForSeconds(0.1f);
             if (enemyRenderer != null)
-                enemyRenderer.material.color = originalColor;
+            {
+                enemyRenderer.material.color = damageColor;
+                yield return new WaitForSeconds(DAMAGE_FLASH_DURATION);
+                
+                if (enemyRenderer != null) // Nochmal checken nach Wait
+                    enemyRenderer.material.color = originalColor;
+            }
         }
 
         void Die()
         {
-            Debug.Log("Enemy died!");
+            Debug.Log($"Enemy {gameObject.name} died!");
+            
             if (stateManager != null)
+            {
+                // State Manager übernimmt und löst das Event aus
                 stateManager.SwitchState(stateManager.deadState);
+            }
             else
+            {
+                // Falls kein StateManager, direkt Event und Pool
+                GameEvents.EnemyDied(gameObject);
                 ReturnToPool();
+            }
         }
 
         void ReturnToPool()
         {
             PoolManager.Instance.Despawn("Enemy", gameObject);
         }
+        
+        // Public Getters
+        public float GetHealthPercentage() => currentHealth / maxHealth;
+        public bool IsAlive() => currentHealth > 0;
+        public bool IsDamaged() => currentHealth < maxHealth;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
+using Core.Events;
 
 namespace Characters.Enemies
 {
@@ -29,11 +30,6 @@ namespace Characters.Enemies
         public ModularRoomBuilder roomBuilder;
         public float wallOffset = 1.5f;
         
-        // Events für andere Systeme
-        public delegate void WaveEvent(int waveNumber);
-        public static event WaveEvent OnWaveStart;
-        public static event WaveEvent OnWaveComplete;
-        
         private List<GameObject> activeEnemies = new List<GameObject>();
         
         void Start()
@@ -45,18 +41,28 @@ namespace Characters.Enemies
             if (waveCompletePanel != null)
                 waveCompletePanel.SetActive(false);
             
+            // Events abonnieren
+            GameEvents.OnEnemyDied += OnEnemyDied;
+            
             // Erste Wave starten
             StartCoroutine(StartNextWaveWithDelay(2f));
         }
         
-        void Update()
+        void OnDestroy()
         {
-            // Prüfe ob Wave abgeschlossen ist
-            if (waveInProgress)
+            // Events abmelden um Memory Leaks zu vermeiden
+            GameEvents.OnEnemyDied -= OnEnemyDied;
+        }
+        
+        void OnEnemyDied(GameObject enemy)
+        {
+            if (waveInProgress && activeEnemies.Contains(enemy))
             {
-                // Entferne null/zerstörte Enemies aus Liste
-                activeEnemies.RemoveAll(enemy => enemy == null || !enemy.activeInHierarchy);
+                activeEnemies.Remove(enemy);
                 enemiesAlive = activeEnemies.Count;
+                
+                // Event für UI Updates
+                GameEvents.EnemiesRemainingChanged(enemiesAlive, enemiesInCurrentWave);
                 
                 UpdateUI();
                 
@@ -74,7 +80,7 @@ namespace Characters.Enemies
             Debug.Log($"Wave {currentWave} complete!");
             
             // Event auslösen
-            OnWaveComplete?.Invoke(currentWave);
+            GameEvents.WaveCompleted(currentWave);
             
             // UI Update
             if (waveCompletePanel != null)
@@ -109,7 +115,7 @@ namespace Characters.Enemies
             Debug.Log($"Starting Wave {currentWave} with {enemiesInCurrentWave} enemies");
             
             // Event auslösen
-            OnWaveStart?.Invoke(currentWave);
+            GameEvents.WaveStarted(currentWave);
             
             // Enemies spawnen
             StartCoroutine(SpawnWaveEnemies());
@@ -135,6 +141,9 @@ namespace Characters.Enemies
                 {
                     activeEnemies.Add(enemy);
                     
+                    // Event auslösen für andere Systeme
+                    GameEvents.EnemySpawned(enemy);
+                    
                     // Spawn Animation/Effekt
                     AddSpawnEffect(enemy);
                 }
@@ -148,6 +157,7 @@ namespace Characters.Enemies
             }
             
             enemiesAlive = activeEnemies.Count;
+            GameEvents.EnemiesRemainingChanged(enemiesAlive, enemiesInCurrentWave);
             Debug.Log($"Wave {currentWave}: Spawned {enemiesAlive} enemies");
         }
         
@@ -196,7 +206,7 @@ namespace Characters.Enemies
             enemy.transform.localScale = Vector3.zero;
             StartCoroutine(ScaleIn(enemy.transform));
             
-            // Particle Effect spawnen
+            // Particle Effect spawnen (wenn vorhanden)
             // GameObject spawnVFX = PoolManager.Instance.Spawn("SpawnVFX", enemy.transform.position, Quaternion.identity);
         }
         
@@ -248,11 +258,15 @@ namespace Characters.Enemies
             }
             activeEnemies.Clear();
             enemiesAlive = 0;
+            GameEvents.EnemiesRemainingChanged(0, enemiesInCurrentWave);
         }
         
         // Wave Info für andere Systeme
         public int GetCurrentWave() => currentWave;
         public int GetEnemiesRemaining() => enemiesAlive;
         public bool IsWaveInProgress() => waveInProgress;
+        
+        // Öffentlicher Zugriff auf aktive Enemies (für andere Systeme)
+        public List<GameObject> GetActiveEnemies() => new List<GameObject>(activeEnemies);
     }
 }
