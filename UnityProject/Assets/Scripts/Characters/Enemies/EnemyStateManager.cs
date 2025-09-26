@@ -29,18 +29,66 @@ namespace Characters.Enemies
         
         void Start()
         {
+            Initialize();
+        }
+        
+        void OnEnable()
+        {
+            // Beim Pool-Recycling neu initialisieren
+            Initialize();
+        }
+        
+        void Initialize()
+        {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 player = playerObj.transform;
 
-            controller = GetComponent<CharacterController>();
+            if (controller == null)
+                controller = GetComponent<CharacterController>();
+                
             if (controller == null)
                 controller = gameObject.AddComponent<CharacterController>();
 
-            health = GetComponent<EnemyHealth>();
+            if (health == null)
+                health = GetComponent<EnemyHealth>();
 
-            // Startzustand
+            // Startzustand setzen
+            currentState = null;
             SwitchState(idleState);
+        }
+        
+        public void ResetEnemy()
+        {
+            // Combat Timer zurücksetzen
+            nextAttackTime = 0f;
+            
+            // State komplett zurücksetzen
+            if (currentState != null)
+                currentState.Exit(this);
+            
+            currentState = null;
+            
+            if (controller != null)
+            {
+                controller.enabled = false;
+                // KEINE Position-Änderung hier!
+                // transform.position wird vom PoolManager gesetzt
+            }
+            
+            // Player-Referenz neu holen
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+                player = playerObj.transform;
+            
+            // Zurück zum Idle State
+            SwitchState(idleState);
+            
+            // CharacterController wieder enablen NACH State-Wechsel
+            if (controller != null)
+            {
+                controller.enabled = true;
+            }
         }
 
         void Update()
