@@ -17,7 +17,7 @@ MonoBehaviour:
   fireMode: 2
   damage: 1
   attackSpeed: 0.05
-  weaponPrefab: {fileID: 0}
+  weaponPrefab: {fileID: 4233209234532055656, guid: 065cc0cdf2cc74a42a8f2f9e007aced3, type: 3}
   detectionRange: 8
   projectiles:
   - prefab: {fileID: 4233209234532055656, guid: 065cc0cdf2cc74a42a8f2f9e007aced3, type: 3}
