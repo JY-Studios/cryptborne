@@ -109,12 +109,18 @@ public class PoolManager : MonoBehaviour
         Debug.Log($"Created pool '{poolName}' with {size} objects");
     }
     
-    public GameObject Spawn(string poolName, Vector3 position, Quaternion rotation)
+    public GameObject Spawn(string poolName, Vector3 position, Quaternion rotation, GameObject fallbackPrefab = null, int defaultSize = 10)
     {
+        // Wenn der Pool nicht existiert → neu erstellen
         if (!poolDictionary.ContainsKey(poolName))
         {
-            Debug.LogError($"Pool '{poolName}' doesn't exist!");
-            return null;
+            if (fallbackPrefab == null)
+            {
+                Debug.LogError($"Pool '{poolName}' doesn't exist and no prefab was provided!");
+                return null;
+            }
+
+            CreatePool(poolName, fallbackPrefab, defaultSize);
         }
     
         GameObject obj = null;
@@ -196,10 +202,10 @@ public class PoolManager : MonoBehaviour
     {
         switch (poolName)
         {
-            case "Bullet":
-                Bullet bullet = obj.GetComponent<Bullet>();
-                if (bullet != null) bullet.ResetBullet();
-                break;
+            // case "Bullet":
+            //     Bullet bullet = obj.GetComponent<Bullet>();
+            //     if (bullet != null) bullet.ResetBullet();
+            //     break;
             
             case "Enemy":
                 // Enemy Health reset

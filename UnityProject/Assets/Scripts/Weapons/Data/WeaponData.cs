@@ -8,6 +8,7 @@ namespace Weapons.Data
     {
         public string weaponName;
         public Sprite icon;
+        public FireMode fireMode;
 
         [Header("Stats")]
         public float damage;

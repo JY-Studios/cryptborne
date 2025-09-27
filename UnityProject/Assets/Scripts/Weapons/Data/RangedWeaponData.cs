@@ -7,7 +7,7 @@ namespace Weapons.Data
     [CreateAssetMenu(menuName = "Weapons/RangedWeapon")]
     public class RangedWeaponData : WeaponData
     {
-        public float range;
+        public float detectionRange;
         public List<ProjectileConfig> projectiles;
     }
 }

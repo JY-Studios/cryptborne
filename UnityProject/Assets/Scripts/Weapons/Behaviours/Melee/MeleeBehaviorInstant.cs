@@ -14,8 +14,11 @@ namespace Weapons.Behaviours.Melee
             this.targetTag = targetTag;
         }
 
-        public void Attack(MeleeWeaponData data, Vector3 position, Vector3 direction)
+        public void Attack(MeleeWeaponData data, Transform player)
         {
+            var position = player.position;
+            var direction = player.forward;
+            
             Collider[] hits = Physics.OverlapSphere(position, data.radius);
             var alreadyHit = new HashSet<GameObject>();
 

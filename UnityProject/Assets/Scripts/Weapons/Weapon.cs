@@ -17,10 +17,30 @@ namespace Weapons
             _behavior = behavior;
         }
         
-        public void Attack(Vector3 pos, Vector3 dir)
+        private bool CooldownReady => Time.time >= _lastAttackTime + _data.attackSpeed;
+        
+        public void TryAttack(Transform player, bool inputPressed)
         {
-            if (Time.time < _lastAttackTime + 1f / _data.attackSpeed) return;
-            _behavior.Attack(_data, pos, dir); 
+            switch (_data.fireMode)
+            {
+                case FireMode.Manual:
+                    if (inputPressed && CooldownReady) Attack(player);
+                    break;
+
+                case FireMode.AutoHold:
+                    if (inputPressed && CooldownReady) Attack(player);
+                    break;
+
+                case FireMode.AutoFire:
+                    if (CooldownReady) Attack(player);
+                    break;
+            }
+        }
+
+        private void Attack(Transform player)
+        {
+            _behavior.Attack(_data, player);
+            _lastAttackTime = Time.time;
         }
     }
 }

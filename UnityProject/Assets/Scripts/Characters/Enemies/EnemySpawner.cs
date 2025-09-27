@@ -9,6 +9,8 @@ namespace Characters.Enemies
 {
     public class EnemySpawner : MonoBehaviour
     {
+        public static EnemySpawner Instance;
+        
         [Header("Wave Settings")]
         public int startingEnemies = 5; // Enemies in Wave 1
         public int enemiesIncreasePerWave = 1; // Wie viele mehr pro Wave
@@ -32,8 +34,12 @@ namespace Characters.Enemies
         
         private List<GameObject> activeEnemies = new List<GameObject>();
         
+        public List<GameObject> ActiveEnemies => activeEnemies;
+
         void Start()
         {
+            Instance = this;
+            
             if (roomBuilder == null)
                 roomBuilder = FindObjectOfType<ModularRoomBuilder>();
             

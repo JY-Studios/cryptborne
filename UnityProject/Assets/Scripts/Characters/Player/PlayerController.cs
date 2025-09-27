@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Weapons;
 using Weapons.Behaviours.Melee;
+using Weapons.Behaviours.Ranged;
 using Weapons.Data;
 
 namespace Characters.Player
@@ -18,8 +19,8 @@ namespace Characters.Player
         private bool isDashing;
         private bool canDash = true;
         private CharacterController controller;
-        public MeleeWeaponData WeaponData;
-        private Weapon<MeleeWeaponData> weapon;
+        public RangedWeaponData WeaponData;
+        private Weapon<RangedWeaponData> weapon;
     
         void Start()
         {
@@ -30,8 +31,8 @@ namespace Characters.Player
                 controller = gameObject.AddComponent<CharacterController>();
             }
 
-            var meleeBehavior = new MeleeBehaviorInstant("Enemy"); // Layer für Gegner
-            weapon = new Weapon<MeleeWeaponData>(WeaponData, meleeBehavior);
+            var meleeBehavior = new ShootNearestBehaviour(); // Layer für Gegner
+            weapon = new Weapon<RangedWeaponData>(WeaponData, meleeBehavior);
         }
     
         void Update()
@@ -56,20 +57,13 @@ namespace Characters.Player
             // Bewegung direkt in Update für perfekte Synchronisation
             if (!isDashing)
             {
-                Vector3 move = new Vector3(moveInput.x, 0, moveInput.y) * moveSpeed * Time.deltaTime;
+                Vector3 move = new Vector3(moveInput.x, 0, moveInput.y) * (moveSpeed * Time.deltaTime);
                 controller.Move(move);
             }
             
-            var mouse = Mouse.current;
-            if (mouse != null && mouse.rightButton.wasPressedThisFrame)
-            {
-                // Position und Richtung für die Waffe
-                Vector3 attackPos = transform.position;
-                Vector3 attackDir = transform.forward;
+            bool inputPressed = Mouse.current.leftButton.isPressed;
 
-                // Angriff ausführen
-                weapon.Attack(attackPos, attackDir);
-            }
+            weapon.TryAttack(transform, inputPressed);
         }
     
         System.Collections.IEnumerator Dash()
@@ -80,7 +74,7 @@ namespace Characters.Player
             float elapsed = 0;
             while (elapsed < dashDuration)
             {
-                Vector3 dashMove = new Vector3(moveInput.x, 0, moveInput.y) * dashSpeed * Time.deltaTime;
+                Vector3 dashMove = new Vector3(moveInput.x, 0, moveInput.y) * (dashSpeed * Time.deltaTime);
                 controller.Move(dashMove);
                 elapsed += Time.deltaTime;
                 yield return null;

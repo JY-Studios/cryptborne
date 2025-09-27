@@ -6,6 +6,6 @@ namespace Weapons.Behaviours
     public interface IWeaponBehavior<in TData>
         where TData : WeaponData
     {
-        void Attack(TData data, Vector3 position, Vector3 direction);
+        void Attack(TData data, Transform player);
     }
 }
