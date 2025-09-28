@@ -5,9 +5,9 @@ namespace Weapons.Projectiles.Effects
 {
     public class DamageEffect : IProjectileEffect
     {
-        private int damage;
+        private float damage;
 
-        public DamageEffect(int damage)
+        public DamageEffect(float damage)
         {
             this.damage = damage;
         }

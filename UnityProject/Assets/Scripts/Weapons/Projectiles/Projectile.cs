@@ -7,6 +7,7 @@ namespace Weapons.Projectiles
         private Vector3 _startPos;
         private IProjectileEffect _effect;
         private ProjectileConfig _config;
+        private bool _hasHit = false;  // Verhindert mehrfache Treffer
 
         private Rigidbody _rb;
 
@@ -20,6 +21,7 @@ namespace Weapons.Projectiles
             _config = config;
             _effect = effect;
             _startPos = transform.position;
+            _hasHit = false;  // Bei Init zurücksetzen
             transform.forward = direction;
 
             // Physikbewegung setzen
@@ -44,12 +46,21 @@ namespace Weapons.Projectiles
 
         private void OnTriggerEnter(Collider other)
         {
+            // Nur einmal treffen erlauben
+            if (_hasHit) return;
+            
+            // Nur Enemies treffen (verhindert Treffer von anderen Objekten)
+            if (!other.CompareTag("Enemy")) return;
+            
+            _hasHit = true;  // Sofort als getroffen markieren
             _effect?.OnHit(other.gameObject, this);
             Despawn();
         }
 
         private void Despawn()
         {
+            // Sicherstellen, dass das Bullet deaktiviert wird
+            _hasHit = true;  // Extra Sicherheit
             PoolManager.Instance.DespawnAuto(gameObject);
         }
 
@@ -62,6 +73,7 @@ namespace Weapons.Projectiles
                 _rb.angularVelocity = Vector3.zero;
             }
 
+            _hasHit = false;  // WICHTIG - Reset des Hit-Flags!
             _effect = null;
             _config = null;
             _startPos = Vector3.zero;

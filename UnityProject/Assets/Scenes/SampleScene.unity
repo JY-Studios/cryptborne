@@ -1591,6 +1591,7 @@ MonoBehaviour:
   enemiesInCurrentWave: 0
   enemiesAlive: 0
   waveInProgress: 0
+  isSpawning: 0
   waveText: {fileID: 1539510247}
   enemiesRemainingText: {fileID: 1700709951}
   waveCompletePanel: {fileID: 2106424433}

@@ -49,7 +49,7 @@ namespace Weapons.Behaviours.Ranged
 
                     var proj = go.GetComponent<Projectile>();
                     proj.ResetProjectile();
-                    proj.Init(projectile, finalDir, new DamageEffect((int)data.damage));
+                    proj.Init(projectile, finalDir, new DamageEffect(data.damage));
                 }
             }
         }
