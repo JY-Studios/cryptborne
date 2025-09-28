@@ -34,20 +34,23 @@ namespace Weapons.Behaviours.Ranged
             //Implement correct PoolManager
             foreach (var projectile in data.projectiles)
             {
-                Quaternion spreadRot = Quaternion.Euler(0, Random.Range(-projectile.spread, projectile.spread), 0);
-                Vector3 finalDir = spreadRot * dir;
+                for (int i = 0; i < projectile.count; i++)
+                {
+                    Quaternion spreadRot = Quaternion.Euler(0, Random.Range(-projectile.spread, projectile.spread), 0);
+                    Vector3 finalDir = spreadRot * dir;
+ 
+                    var go = PoolManager.Instance.Spawn(
+                        poolName: projectile.prefab.name,     // z. B. "Bullet"
+                        position: spawnPos,
+                        rotation: Quaternion.LookRotation(finalDir),
+                        fallbackPrefab: projectile.prefab,    // falls noch kein Pool existiert
+                        defaultSize: 20                                 // Anfangsgröße
+                    );
 
-                var go = PoolManager.Instance.Spawn(
-                    poolName: projectile.prefab.name,     // z. B. "Bullet"
-                    position: spawnPos,
-                    rotation: Quaternion.LookRotation(finalDir),
-                    fallbackPrefab: projectile.prefab,    // falls noch kein Pool existiert
-                    defaultSize: 20                                 // Anfangsgröße
-                );
-
-                var proj = go.GetComponent<Projectile>();
-                proj.ResetProjectile();
-                proj.Init(projectile, finalDir, new DamageEffect((int)data.damage));
+                    var proj = go.GetComponent<Projectile>();
+                    proj.ResetProjectile();
+                    proj.Init(projectile, finalDir, new DamageEffect((int)data.damage));
+                }
             }
         }
     }
