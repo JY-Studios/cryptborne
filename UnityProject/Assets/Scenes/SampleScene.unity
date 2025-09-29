@@ -1164,9 +1164,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e782895b936a46d0aedf43bcdbe8d26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthUI
-  healthText: {fileID: 0}
-  waveText: {fileID: 0}
-  enemiesText: {fileID: 0}
+  healthText: {fileID: 1524247713}
+  waveText: {fileID: 1539510247}
+  enemiesText: {fileID: 1700709951}
   healthFormat: 'HP: {0}/{1}'
   waveFormat: Wave {0}
   enemiesFormat: 'Enemies: {0}/{1}'
