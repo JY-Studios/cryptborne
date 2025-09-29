@@ -9,12 +9,13 @@ namespace Weapons
     {
         private readonly TData _data;
         private IWeaponBehavior<TData> _behavior;
-        private float _lastAttackTime = -999f;
+        private float _lastAttackTime = float.MinValue;
         
         public Weapon(TData data, IWeaponBehavior<TData> behavior)
         {
             _data = data;
             _behavior = behavior;
+            _lastAttackTime = Time.time - data.attackSpeed - 1f; // Sicherstellen dass Cooldown ready ist
         }
         
         private bool CooldownReady => Time.time >= _lastAttackTime + _data.attackSpeed;

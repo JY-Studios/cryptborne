@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94854d2195724c059bff73c5f951e99a, type: 3}
+  m_Name: AOE
+  m_EditorClassIdentifier: Assembly-CSharp::Weapons.Data.RangedWeaponData
+  weaponName: AOE
+  icon: {fileID: 0}
+  fireMode: 2
+  damage: 1
+  attackSpeed: 1
+  weaponPrefab: {fileID: 0}
+  detectionRange: 10
+  projectiles:
+  - prefab: {fileID: 4233209234532055656, guid: 065cc0cdf2cc74a42a8f2f9e007aced3, type: 3}
+    count: 12
+    spread: 0
+    range: 10
+    speed: 15
+    pattern: 5
+    orbitRadius: 0
+    orbitSpeed: 0
+    orbitStartAngle: 0

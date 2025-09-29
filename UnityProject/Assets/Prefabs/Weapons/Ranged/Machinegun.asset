@@ -10,19 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94854d2195724c059bff73c5f951e99a, type: 3}
-  m_Name: Machinegun
+  m_Name: MachineGun
   m_EditorClassIdentifier: Assembly-CSharp::Weapons.Data.RangedWeaponData
-  weaponName: Machinegun
+  weaponName: MachineGun
   icon: {fileID: 0}
   fireMode: 2
-  damage: 0.5
+  damage: 0.25
   attackSpeed: 0.1
   weaponPrefab: {fileID: 0}
   detectionRange: 8
   projectiles:
   - prefab: {fileID: 4233209234532055656, guid: 065cc0cdf2cc74a42a8f2f9e007aced3, type: 3}
     count: 1
-    spread: 50
+    spread: 40
     range: 8
-    speed: 20
-    pattern: 0
+    speed: 25
+    pattern: 1
+    orbitRadius: 0
+    orbitSpeed: 0
+    orbitStartAngle: 0

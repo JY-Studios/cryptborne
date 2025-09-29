@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   fireMode: 2
   damage: 5
-  attackSpeed: 5
+  attackSpeed: 3
   weaponPrefab: {fileID: 0}
   detectionRange: 20
   projectiles:
@@ -24,4 +24,8 @@ MonoBehaviour:
     count: 1
     spread: 0
     range: 20
-    speed: 40
+    speed: 20
+    pattern: 0
+    orbitRadius: 0
+    orbitSpeed: 0
+    orbitStartAngle: 0

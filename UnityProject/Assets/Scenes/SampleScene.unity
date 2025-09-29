@@ -872,7 +872,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 60}
-  m_SizeDelta: {x: 400, y: 100}
+  m_SizeDelta: {x: 700, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1207867722
 MonoBehaviour:
@@ -890,7 +890,7 @@ MonoBehaviour:
   slotsContainer: {fileID: 1207867721}
   selectedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
-  maxSlots: 4
+  maxSlots: 5
 --- !u!114 &1207867724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1110,8 +1110,10 @@ MonoBehaviour:
   availableWeapons:
   - {fileID: 11400000, guid: 706da1081a27e41418848e6a152735e7, type: 2}
   - {fileID: 11400000, guid: dcc5abd968ab6a24a97c540d6b7de2ac, type: 2}
+  - {fileID: 11400000, guid: 07775df8ebf894ac0b5e32ef6875c23e, type: 2}
+  - {fileID: 11400000, guid: 988dfb296a0ad4209b83599ca955c4d4, type: 2}
   - {fileID: 11400000, guid: ccf688eff2f63194e9201eae17c37733, type: 2}
-  maxWeaponSlots: 4
+  maxWeaponSlots: 5
   currentWeaponIndex: 0
   currentWeaponData: {fileID: 0}
 --- !u!1 &1524247710

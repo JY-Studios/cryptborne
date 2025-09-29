@@ -16,13 +16,16 @@ MonoBehaviour:
   icon: {fileID: 0}
   fireMode: 2
   damage: 1
-  attackSpeed: 2
+  attackSpeed: 1
   weaponPrefab: {fileID: 0}
-  detectionRange: 10
+  detectionRange: 5
   projectiles:
   - prefab: {fileID: 4233209234532055656, guid: 065cc0cdf2cc74a42a8f2f9e007aced3, type: 3}
-    count: 5
+    count: 8
     spread: 90
-    range: 10
+    range: 5
     speed: 20
-    pattern: 1
+    pattern: 2
+    orbitRadius: 0
+    orbitSpeed: 0
+    orbitStartAngle: 0

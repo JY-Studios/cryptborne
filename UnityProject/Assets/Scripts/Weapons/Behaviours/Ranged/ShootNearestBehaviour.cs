@@ -27,41 +27,111 @@ namespace Weapons.Behaviours.Ranged
             Vector3 dir = (nearestEnemy.transform.position - player.position).normalized;
             dir.y = 0f;
             player.rotation = Quaternion.LookRotation(dir);
-            
-            Vector3 spawnPos = player.position + dir;
 
             foreach (var projectile in data.projectiles)
             {
-                Vector3[] directions = CalculateSpreadPattern(dir, projectile);
-                
-                for (int i = 0; i < directions.Length; i++)
-                {
-                    var go = PoolManager.Instance.Spawn(
-                        poolName: projectile.prefab.name,
-                        position: spawnPos,
-                        rotation: Quaternion.LookRotation(directions[i]),
-                        fallbackPrefab: projectile.prefab,
-                        defaultSize: 30
-                    );
-
-                    var proj = go.GetComponent<Projectile>();
-                    proj.ResetProjectile();
-                    
-                    // Schaden anpassen basierend auf Anzahl der Projektile
-                    float adjustedDamage = CalculateProjectileDamage(data.damage, projectile);
-                    proj.Init(projectile, directions[i], new DamageEffect(adjustedDamage));
-                }
+                SpawnProjectiles(projectile, player, dir, data.damage);
             }
         }
 
-        private Vector3[] CalculateSpreadPattern(Vector3 baseDir, ProjectileConfig config)
+        private void SpawnProjectiles(ProjectileConfig config, Transform player, Vector3 baseDir, float baseDamage)
         {
-            Vector3[] directions = new Vector3[config.count];
+            // Spezielle Behandlung für Orbit-Pattern
+            if (config.pattern == SpreadPattern.Orbit)
+            {
+                SpawnOrbitProjectiles(config, player, baseDamage);
+                return;
+            }
+            
+            // Normale Projektile
+            Vector3 baseSpawnPos = player.position + baseDir;
+            Vector3[] directions;
+            Vector3[] spawnPositions;
+            
+            CalculateSpreadPattern(baseDir, baseSpawnPos, config, out directions, out spawnPositions);
+            
+            for (int i = 0; i < directions.Length; i++)
+            {
+                var go = PoolManager.Instance.Spawn(
+                    poolName: config.prefab.name,
+                    position: spawnPositions[i],
+                    rotation: Quaternion.LookRotation(directions[i]),
+                    fallbackPrefab: config.prefab,
+                    defaultSize: 30
+                );
+
+                var proj = go.GetComponent<Projectile>();
+                proj.ResetProjectile();
+                proj.Init(config, directions[i], new DamageEffect(baseDamage));
+            }
+        }
+        
+        private void SpawnOrbitProjectiles(ProjectileConfig config, Transform player, float baseDamage)
+        {
+            float orbitStep = 360f / config.count;
+            
+            for (int i = 0; i < config.count; i++)
+            {
+                float startAngle = (orbitStep * i) + config.orbitStartAngle;
+                float angleRad = startAngle * Mathf.Deg2Rad;
+                
+                // Initiale Position im Kreis um den Spieler berechnen
+                Vector3 offset = new Vector3(
+                    Mathf.Cos(angleRad) * config.orbitRadius,
+                    0f,
+                    Mathf.Sin(angleRad) * config.orbitRadius
+                );
+                Vector3 spawnPos = player.position + offset;
+                
+                // Tangentiale Rotation für visuellen Effekt
+                float tangentAngle = startAngle + 90f;
+                Quaternion rotation = Quaternion.Euler(0f, tangentAngle, 0f);
+                
+                var go = PoolManager.Instance.Spawn(
+                    poolName: config.prefab.name,
+                    position: spawnPos,
+                    rotation: rotation,
+                    fallbackPrefab: config.prefab,
+                    defaultSize: 30
+                );
+
+                var proj = go.GetComponent<Projectile>();
+                proj.ResetProjectile();
+                proj.InitOrbit(config, startAngle, player, new DamageEffect(baseDamage));
+            }
+        }
+
+        private void CalculateSpreadPattern(Vector3 baseDir, Vector3 baseSpawnPos, ProjectileConfig config, 
+            out Vector3[] directions, out Vector3[] spawnPositions)
+        {
+            directions = new Vector3[config.count];
+            spawnPositions = new Vector3[config.count];
             
             switch (config.pattern)
             {
+                case SpreadPattern.None:
+                    // Kein Spread - präziser Schuss (Sniper)
+                    for (int i = 0; i < config.count; i++)
+                    {
+                        directions[i] = baseDir;
+                        spawnPositions[i] = baseSpawnPos;
+                    }
+                    break;
+                
+                case SpreadPattern.Random:
+                    // Zufällige Streuung (Machinegun)
+                    for (int i = 0; i < config.count; i++)
+                    {
+                        float angleY = Random.Range(-config.spread * 0.5f, config.spread * 0.5f);
+                        float angleX = Random.Range(-config.spread * 0.25f, config.spread * 0.25f);
+                        Quaternion rot = Quaternion.Euler(angleX, angleY, 0);
+                        directions[i] = rot * baseDir;
+                        spawnPositions[i] = baseSpawnPos;
+                    }
+                    break;
+                    
                 case SpreadPattern.Cone:
-                    // Gleichmäßiger Kegel (perfekt für Shotgun)
+                    // Gleichmäßiger Kegel (Shotgun)
                     float angleStep = config.count > 1 
                         ? config.spread / (config.count - 1) 
                         : 0;
@@ -73,11 +143,12 @@ namespace Weapons.Behaviours.Ranged
                         angle += Random.Range(-1f, 1f); // Kleine Variation für Realismus
                         Quaternion rot = Quaternion.Euler(0, angle, 0);
                         directions[i] = rot * baseDir;
+                        spawnPositions[i] = baseSpawnPos;
                     }
                     break;
                     
                 case SpreadPattern.Horizontal:
-                    // Horizontale Linie
+                    // Horizontale Linie (z.B. für Laser-Array)
                     float hStep = config.count > 1 
                         ? config.spread / (config.count - 1) 
                         : 0;
@@ -88,6 +159,7 @@ namespace Weapons.Behaviours.Ranged
                         float angle = hStart + (hStep * i);
                         Quaternion rot = Quaternion.Euler(0, angle, 0);
                         directions[i] = rot * baseDir;
+                        spawnPositions[i] = baseSpawnPos;
                     }
                     break;
                     
@@ -103,60 +175,76 @@ namespace Weapons.Behaviours.Ranged
                         float angle = vStart + (vStep * i);
                         Quaternion rot = Quaternion.Euler(angle, 0, 0);
                         directions[i] = rot * baseDir;
+                        spawnPositions[i] = baseSpawnPos;
                     }
                     break;
                     
-                case SpreadPattern.Circle:
-                    // Kreisförmig
-                    float circleStep = 360f / config.count;
-                    float radius = config.spread * 0.5f;
+                case SpreadPattern.Radial:
+                    // 360° gleichmäßig verteilt nach außen (AoE Magic)
+                    float radialStep = 360f / config.count;
                     
                     for (int i = 0; i < config.count; i++)
                     {
-                        float angle = circleStep * i;
+                        float angle = radialStep * i;
                         Quaternion rot = Quaternion.Euler(0, angle, 0);
-                        Vector3 offset = rot * (Vector3.forward * radius * 0.1f);
-                        directions[i] = (baseDir + offset).normalized;
+                        directions[i] = rot * Vector3.forward;
+                        spawnPositions[i] = baseSpawnPos;
                     }
                     break;
                     
-                case SpreadPattern.Random:
-                default:
-                    // Zufällige Streuung (gut für Machinegun)
+                case SpreadPattern.Orbit:
+                    // Kreist um den Spieler (Defensive Magic)
+                    // Projektile spawnen in Kreis um Player und kreisen dauerhaft
+                    float orbitStep = 360f / config.count;
+                    Vector3 playerPos = baseSpawnPos - baseDir; // Rückrechnung zur Player-Position
+                    
                     for (int i = 0; i < config.count; i++)
                     {
-                        float angleY = Random.Range(-config.spread * 0.5f, config.spread * 0.5f);
-                        float angleX = Random.Range(-config.spread * 0.25f, config.spread * 0.25f); // Leichte vertikale Streuung
-                        Quaternion rot = Quaternion.Euler(angleX, angleY, 0);
-                        directions[i] = rot * baseDir;
+                        float angle = (orbitStep * i) + config.orbitStartAngle;
+                        float angleRad = angle * Mathf.Deg2Rad;
+                        
+                        // Position im Kreis um den Spieler
+                        Vector3 offset = new Vector3(
+                            Mathf.Cos(angleRad) * config.orbitRadius,
+                            0f,
+                            Mathf.Sin(angleRad) * config.orbitRadius
+                        );
+                        spawnPositions[i] = playerPos + offset;
+                        
+                        // Direction wird für Orbit verwendet um Orbit-Daten zu übergeben
+                        // Format: (orbitCenter.x, orbitCenter.z, startAngle)
+                        directions[i] = new Vector3(playerPos.x, playerPos.z, angle);
                     }
                     break;
-            }
-            
-            return directions;
-        }
-        
-        private float CalculateProjectileDamage(float baseDamage, ProjectileConfig config)
-        {
-            // Für Shotgun-artige Waffen: Schaden auf Pellets aufteilen
-            // Aber nicht zu stark, damit einzelne Treffer noch Sinn machen
-            switch (config.pattern)
-            {
-                case SpreadPattern.Cone:
-                case SpreadPattern.Circle:
-                    // Shotgun-Logik: Gesamtschaden wird etwas aufgeteilt
-                    // Aber einzelne Pellets sollten noch Schaden machen
-                    return baseDamage / Mathf.Max(1f, config.count * 0.3f);
                     
-                case SpreadPattern.Horizontal:
-                case SpreadPattern.Vertical:
-                    // Mittlere Aufteilung
-                    return baseDamage / Mathf.Max(1f, config.count * 0.5f);
+                case SpreadPattern.Spiral:
+                    // Spiralförmig rotierend (Wirbel-Effekt)
+                    float spiralStep = 360f / config.count;
+                    float spiralSpread = config.spread / config.count;
                     
-                case SpreadPattern.Random:
+                    for (int i = 0; i < config.count; i++)
+                    {
+                        float angle = spiralStep * i;
+                        float currentSpread = spiralSpread * i;
+                        
+                        Quaternion rot = Quaternion.Euler(0, angle, 0);
+                        Vector3 spiralDir = rot * baseDir;
+                        
+                        // Zusätzliche Streuung für Spiral-Effekt
+                        Quaternion spreadRot = Quaternion.Euler(0, currentSpread, 0);
+                        directions[i] = spreadRot * spiralDir;
+                        spawnPositions[i] = baseSpawnPos;
+                    }
+                    break;
+                    
                 default:
-                    // Voller Schaden pro Projektil (Machinegun)
-                    return baseDamage;
+                    // Fallback auf None
+                    for (int i = 0; i < config.count; i++)
+                    {
+                        directions[i] = baseDir;
+                        spawnPositions[i] = baseSpawnPos;
+                    }
+                    break;
             }
         }
     }
