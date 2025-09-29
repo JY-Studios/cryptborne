@@ -1,9 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Weapons;
-using Weapons.Behaviours.Melee;
-using Weapons.Behaviours.Ranged;
-using Weapons.Data;
 
 namespace Characters.Player
 {
@@ -19,20 +15,16 @@ namespace Characters.Player
         private bool isDashing;
         private bool canDash = true;
         private CharacterController controller;
-        public RangedWeaponData WeaponData;
-        private Weapon<RangedWeaponData> weapon;
+        // WeaponData und weapon entfernt - jetzt in WeaponInventory
     
         void Start()
         {
-            // CharacterController statt Rigidbody verwenden
             controller = GetComponent<CharacterController>();
             if (controller == null)
             {
                 controller = gameObject.AddComponent<CharacterController>();
             }
-
-            var meleeBehavior = new ShootNearestBehaviour(); // Layer für Gegner
-            weapon = new Weapon<RangedWeaponData>(WeaponData, meleeBehavior);
+            // Weapon-Initialisierung entfernt
         }
     
         void Update()
@@ -54,16 +46,14 @@ namespace Characters.Player
                 }
             }
         
-            // Bewegung direkt in Update für perfekte Synchronisation
+            // Bewegung
             if (!isDashing)
             {
                 Vector3 move = new Vector3(moveInput.x, 0, moveInput.y) * (moveSpeed * Time.deltaTime);
                 controller.Move(move);
             }
             
-            bool inputPressed = Mouse.current.leftButton.isPressed;
-
-            weapon.TryAttack(transform, inputPressed);
+            // Weapon-Logik entfernt - jetzt in WeaponInventory
         }
     
         System.Collections.IEnumerator Dash()

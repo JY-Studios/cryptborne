@@ -496,6 +496,7 @@ RectTransform:
   - {fileID: 1524247711}
   - {fileID: 646808486}
   - {fileID: 2106424434}
+  - {fileID: 1207867721}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -836,6 +837,86 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1207867720
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1207867721}
+  - component: {fileID: 1207867724}
+  - component: {fileID: 1207867722}
+  m_Layer: 5
+  m_Name: WeaponHotbar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1207867721
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207867720}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 448171637}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 60}
+  m_SizeDelta: {x: 400, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1207867722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207867720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 405fe5c713cf3453da2ea683ed14a773, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponHotbarUI
+  slotPrefab: {fileID: 6440800375155131108, guid: c89b4b2a7b9a54ca899079e0f601ae0f, type: 3}
+  slotsContainer: {fileID: 1207867721}
+  selectedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  maxSlots: 4
+--- !u!114 &1207867724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1207867720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 10
+    m_Right: 10
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 10
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &1238952114
 GameObject:
   m_ObjectHideFlags: 0
@@ -847,10 +928,11 @@ GameObject:
   - component: {fileID: 1238952119}
   - component: {fileID: 1238952117}
   - component: {fileID: 1238952116}
-  - component: {fileID: 1238952120}
   - component: {fileID: 1238952121}
+  - component: {fileID: 1238952120}
   - component: {fileID: 1238952122}
   - component: {fileID: 1238952123}
+  - component: {fileID: 1238952124}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -961,7 +1043,6 @@ MonoBehaviour:
   dashSpeed: 15
   dashDuration: 0.2
   dashCooldown: 1
-  WeaponData: {fileID: 11400000, guid: 706da1081a27e41418848e6a152735e7, type: 2}
 --- !u!143 &1238952121
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1014,6 +1095,25 @@ MonoBehaviour:
   maxHealth: 5
   currentHealth: 0
   invulnerabilityTime: 1
+--- !u!114 &1238952124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238952114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b40f27fee70dd44588716d68cc2a9caf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Characters.Player.WeaponInventory
+  availableWeapons:
+  - {fileID: 11400000, guid: 706da1081a27e41418848e6a152735e7, type: 2}
+  - {fileID: 11400000, guid: dcc5abd968ab6a24a97c540d6b7de2ac, type: 2}
+  - {fileID: 11400000, guid: ccf688eff2f63194e9201eae17c37733, type: 2}
+  maxWeaponSlots: 4
+  currentWeaponIndex: 0
+  currentWeaponData: {fileID: 0}
 --- !u!1 &1524247710
 GameObject:
   m_ObjectHideFlags: 0
