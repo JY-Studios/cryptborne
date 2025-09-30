@@ -15,7 +15,7 @@ MonoBehaviour:
   weaponName: MachineGun
   icon: {fileID: 0}
   fireMode: 2
-  damage: 0.25
+  damage: 8
   attackSpeed: 0.1
   weaponPrefab: {fileID: 0}
   detectionRange: 8
