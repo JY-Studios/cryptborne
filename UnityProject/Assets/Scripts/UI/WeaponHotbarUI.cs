@@ -8,8 +8,8 @@ using Weapons.Data;
 public class WeaponHotbarUI : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject slotPrefab; // Prefab für einen Slot
-    public Transform slotsContainer; // Parent für die Slots
+    public GameObject slotPrefab;
+    public Transform slotsContainer;
     public Color selectedColor = Color.yellow;
     public Color normalColor = Color.white;
     
@@ -21,9 +21,18 @@ public class WeaponHotbarUI : MonoBehaviour
     private List<Image> weaponIcons = new List<Image>();
     private List<TextMeshProUGUI> slotNumbers = new List<TextMeshProUGUI>();
     private List<TextMeshProUGUI> weaponNames = new List<TextMeshProUGUI>();
+    private bool isInitialized = false;
     
     void OnEnable()
     {
+        // Slots SOFORT erstellen bevor Events subscribed werden
+        if (!isInitialized)
+        {
+            CreateSlots();
+            isInitialized = true;
+        }
+        
+        // Jetzt Events subscriben - UI ist ready
         WeaponInventory.OnWeaponSwitched += OnWeaponSwitched;
         WeaponInventory.OnWeaponInventoryChanged += OnInventoryChanged;
     }
@@ -34,17 +43,13 @@ public class WeaponHotbarUI : MonoBehaviour
         WeaponInventory.OnWeaponInventoryChanged -= OnInventoryChanged;
     }
     
-    void Start()
-    {
-        CreateSlots();
-    }
-    
     void CreateSlots()
     {
         // Lösche alte Slots
         foreach (var slot in slotObjects)
         {
-            Destroy(slot);
+            if (slot != null)
+                Destroy(slot);
         }
         slotObjects.Clear();
         slotBackgrounds.Clear();
@@ -74,11 +79,21 @@ public class WeaponHotbarUI : MonoBehaviour
             
             TextMeshProUGUI name = slot.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
             weaponNames.Add(name);
+            
+            // Initial als leer markieren
+            if (weaponIcons[i] != null)
+                weaponIcons[i].gameObject.SetActive(false);
+            if (weaponNames[i] != null)
+                weaponNames[i].text = "Empty";
         }
+        
+        Debug.Log($"WeaponHotbarUI: Created {maxSlots} slots");
     }
     
     void OnWeaponSwitched(RangedWeaponData weapon, int index)
     {
+        if (!isInitialized) return;
+        
         // Update selected slot visual
         for (int i = 0; i < slotBackgrounds.Count; i++)
         {
@@ -87,10 +102,18 @@ public class WeaponHotbarUI : MonoBehaviour
                 slotBackgrounds[i].color = (i == index) ? selectedColor : normalColor;
             }
         }
+        
+        Debug.Log($"WeaponHotbarUI: Switched to slot {index} - {weapon.weaponName}");
     }
     
     void OnInventoryChanged(List<RangedWeaponData> weapons, int currentIndex)
     {
+        if (!isInitialized)
+        {
+            Debug.LogWarning("WeaponHotbarUI: OnInventoryChanged called but not initialized!");
+            return;
+        }
+        
         // Update alle Slots
         for (int i = 0; i < maxSlots; i++)
         {
@@ -127,5 +150,6 @@ public class WeaponHotbarUI : MonoBehaviour
         }
         
         OnWeaponSwitched(weapons[currentIndex], currentIndex);
+        Debug.Log($"WeaponHotbarUI: Inventory updated - {weapons.Count} weapons");
     }
 }

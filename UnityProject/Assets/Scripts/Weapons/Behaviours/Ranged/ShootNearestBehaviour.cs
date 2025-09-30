@@ -13,6 +13,23 @@ namespace Weapons.Behaviours.Ranged
 
         public void Attack(RangedWeaponData data, Transform player)
         {
+            // Prüfe ob es Orbit-Projektile gibt - diese brauchen KEIN Target!
+            bool hasOrbitProjectiles = data.projectiles.Any(p => p.pattern == SpreadPattern.Orbit);
+            
+            if (hasOrbitProjectiles)
+            {
+                // Orbit-Waffen spawnen IMMER, unabhängig von Enemies
+                foreach (var projectile in data.projectiles)
+                {
+                    if (projectile.pattern == SpreadPattern.Orbit)
+                    {
+                        SpawnProjectiles(projectile, player, Vector3.forward, data.damage);
+                    }
+                }
+                return;
+            }
+            
+            // Normale Waffen brauchen ein Target
             var nearestEnemy = EnemySpawner.Instance.ActiveEnemies
                 .Where(e => e && e.activeInHierarchy)
                 .Select(e => new { enemy = e, dist = Vector3.Distance(player.position, e.transform.position) })
@@ -148,7 +165,7 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Horizontal:
-                    // Horizontale Linie (z.B. für Laser-Array)
+                    // Horizontale Linie
                     float hStep = config.count > 1 
                         ? config.spread / (config.count - 1) 
                         : 0;
@@ -193,27 +210,12 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Orbit:
-                    // Kreist um den Spieler (Defensive Magic)
-                    // Projektile spawnen in Kreis um Player und kreisen dauerhaft
-                    float orbitStep = 360f / config.count;
-                    Vector3 playerPos = baseSpawnPos - baseDir; // Rückrechnung zur Player-Position
-                    
+                    // Sollte nie hier ankommen, wird separat gehandhabt
+                    Debug.LogWarning("Orbit pattern should be handled separately!");
                     for (int i = 0; i < config.count; i++)
                     {
-                        float angle = (orbitStep * i) + config.orbitStartAngle;
-                        float angleRad = angle * Mathf.Deg2Rad;
-                        
-                        // Position im Kreis um den Spieler
-                        Vector3 offset = new Vector3(
-                            Mathf.Cos(angleRad) * config.orbitRadius,
-                            0f,
-                            Mathf.Sin(angleRad) * config.orbitRadius
-                        );
-                        spawnPositions[i] = playerPos + offset;
-                        
-                        // Direction wird für Orbit verwendet um Orbit-Daten zu übergeben
-                        // Format: (orbitCenter.x, orbitCenter.z, startAngle)
-                        directions[i] = new Vector3(playerPos.x, playerPos.z, angle);
+                        directions[i] = baseDir;
+                        spawnPositions[i] = baseSpawnPos;
                     }
                     break;
                     

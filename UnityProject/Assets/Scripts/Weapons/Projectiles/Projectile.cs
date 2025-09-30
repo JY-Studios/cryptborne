@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Weapons.Projectiles
@@ -12,12 +13,23 @@ namespace Weapons.Projectiles
 
         // Orbit-spezifische Variablen
         private bool _isOrbiting = false;
-        private Transform _orbitTarget; // Referenz zum Spieler für Orbit
+        private Transform _orbitTarget;
         private float _orbitRadius;
         private float _orbitAngle;
         private float _orbitSpeed;
         private float _orbitLifetime;
         private float _orbitTimer;
+
+        // Hit-Cooldown System für Orbit-Projektile
+        private Dictionary<GameObject, float> _enemyHitCooldowns = new Dictionary<GameObject, float>();
+        private const float HIT_COOLDOWN_DURATION = 0.5f;
+
+        // Public Property für Tracking
+        public bool IsOrbiting => _isOrbiting;
+
+        // STATISCHE LISTE aller aktiven Orbit-Projektile (für einfaches Tracking)
+        private static List<Projectile> _allOrbitProjectiles = new List<Projectile>();
+        public static List<Projectile> AllOrbitProjectiles => _allOrbitProjectiles;
 
         private void Awake()
         {
@@ -31,11 +43,9 @@ namespace Weapons.Projectiles
             _startPos = transform.position;
             _hasHit = false;
             
-            // Normale Projektile
             InitNormalProjectile(direction);
         }
         
-        // Spezielle Init-Methode für Orbit-Projektile
         public void InitOrbit(ProjectileConfig config, float startAngle, Transform target, IProjectileEffect effect)
         {
             _config = config;
@@ -49,12 +59,9 @@ namespace Weapons.Projectiles
             _orbitAngle = startAngle;
             _orbitSpeed = config.orbitSpeed;
             
-            // Orbit-Lifetime basierend auf Range (Zeit in Sekunden)
-            // Je größer die Range, desto länger kreisen die Projektile
             _orbitLifetime = config.range / config.speed;
             _orbitTimer = 0f;
 
-            // Rigidbody deaktivieren für manuelle Bewegung
             if (_rb != null)
             {
                 _rb.linearVelocity = Vector3.zero;
@@ -62,7 +69,13 @@ namespace Weapons.Projectiles
                 _rb.isKinematic = true;
             }
 
-            // Initiale Position setzen
+            // Zur globalen Liste hinzufügen
+            if (!_allOrbitProjectiles.Contains(this))
+            {
+                _allOrbitProjectiles.Add(this);
+                Debug.Log($"Orbit projectile registered. Total orbit projectiles: {_allOrbitProjectiles.Count}");
+            }
+
             UpdateOrbitPosition();
         }
 
@@ -71,7 +84,6 @@ namespace Weapons.Projectiles
             _isOrbiting = false;
             transform.forward = direction;
 
-            // Physikbewegung setzen
             if (_rb != null)
             {
                 _rb.isKinematic = false;
@@ -91,24 +103,28 @@ namespace Weapons.Projectiles
             {
                 UpdateNormalProjectile();
             }
+            
+            CleanupHitCooldowns();
         }
 
         private void UpdateOrbit()
         {
-            // Timer aktualisieren
+            if (_orbitTarget == null)
+            {
+                Debug.LogWarning("Orbit projectile lost target, despawning");
+                Despawn();
+                return;
+            }
+
             _orbitTimer += Time.deltaTime;
             
-            // Lifetime-Check
             if (_orbitTimer >= _orbitLifetime)
             {
                 Despawn();
                 return;
             }
 
-            // Winkel aktualisieren (rotiert um das Center)
             _orbitAngle += _orbitSpeed * Time.deltaTime;
-            
-            // Position auf dem Orbit-Kreis berechnen
             UpdateOrbitPosition();
         }
 
@@ -116,13 +132,12 @@ namespace Weapons.Projectiles
         {
             if (_orbitTarget == null)
             {
+                Debug.LogWarning("Orbit target is null in UpdateOrbitPosition");
                 Despawn();
                 return;
             }
             
             float angleRad = _orbitAngle * Mathf.Deg2Rad;
-            
-            // Orbit-Center ist IMMER die aktuelle Position des Spielers
             Vector3 orbitCenter = _orbitTarget.position;
             
             Vector3 newPos = orbitCenter + new Vector3(
@@ -133,55 +148,97 @@ namespace Weapons.Projectiles
             
             transform.position = newPos;
             
-            // Rotation so dass das Projektil in Bewegungsrichtung zeigt (tangential)
             float tangentAngle = _orbitAngle + 90f;
             transform.rotation = Quaternion.Euler(0f, tangentAngle, 0f);
         }
 
         private void UpdateNormalProjectile()
         {
-            // Nur falls kein Rigidbody da ist → manuelle Bewegung
             if (_rb == null)
                 transform.position += transform.forward * (_config.speed * Time.deltaTime);
 
-            // Reichweite checken
             if (Vector3.Distance(_startPos, transform.position) > _config.range)
                 Despawn();
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            // Nur einmal treffen erlauben
-            if (_hasHit) return;
-            
-            // Nur Enemies treffen
             if (!other.CompareTag("Enemy")) return;
             
-            _hasHit = true;
-            _effect?.OnHit(other.gameObject, this);
-            
-            // Orbit-Projektile despawnen nicht bei Treffer
-            // Sie können mehrere Enemies treffen während sie kreisen
             if (!_isOrbiting)
             {
+                if (_hasHit) return;
+                
+                _hasHit = true;
+                _effect?.OnHit(other.gameObject, this);
                 Despawn();
+                return;
             }
-            else
+            
+            GameObject enemy = other.gameObject;
+            
+            if (CanHitEnemy(enemy))
             {
-                // Kurze Verzögerung bevor wieder getroffen werden kann
-                _hasHit = false;
+                _effect?.OnHit(enemy, this);
+                RegisterHit(enemy);
+            }
+        }
+
+        private bool CanHitEnemy(GameObject enemy)
+        {
+            if (!_enemyHitCooldowns.ContainsKey(enemy))
+                return true;
+            
+            return Time.time >= _enemyHitCooldowns[enemy];
+        }
+
+        private void RegisterHit(GameObject enemy)
+        {
+            _enemyHitCooldowns[enemy] = Time.time + HIT_COOLDOWN_DURATION;
+        }
+
+        private void CleanupHitCooldowns()
+        {
+            List<GameObject> toRemove = new List<GameObject>();
+            
+            foreach (var kvp in _enemyHitCooldowns)
+            {
+                if (kvp.Key == null || Time.time >= kvp.Value + 5f)
+                {
+                    toRemove.Add(kvp.Key);
+                }
+            }
+            
+            foreach (var key in toRemove)
+            {
+                _enemyHitCooldowns.Remove(key);
             }
         }
 
         private void Despawn()
         {
             _hasHit = true;
-            PoolManager.Instance.DespawnAuto(gameObject);
+            
+            // Aus globaler Liste entfernen wenn Orbit
+            if (_isOrbiting)
+            {
+                _allOrbitProjectiles.Remove(this);
+                Debug.Log($"Orbit projectile despawned. Remaining: {_allOrbitProjectiles.Count}");
+            }
+            
+            if (PoolManager.Instance != null)
+            {
+                PoolManager.Instance.DespawnAuto(gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("PoolManager not available, destroying projectile directly");
+                Destroy(gameObject);
+            }
         }
 
         public void ResetProjectile()
         {
-            // Reset für Pool reuse
             if (_rb != null)
             {
                 _rb.linearVelocity = Vector3.zero;
@@ -189,12 +246,17 @@ namespace Weapons.Projectiles
                 _rb.isKinematic = false;
             }
 
+            // Aus globaler Liste entfernen falls noch drin
+            if (_isOrbiting)
+            {
+                _allOrbitProjectiles.Remove(this);
+            }
+
             _hasHit = false;
             _effect = null;
             _config = null;
             _startPos = Vector3.zero;
             
-            // Orbit-Reset
             _isOrbiting = false;
             _orbitTarget = null;
             _orbitRadius = 0f;
@@ -202,6 +264,27 @@ namespace Weapons.Projectiles
             _orbitSpeed = 0f;
             _orbitLifetime = 0f;
             _orbitTimer = 0f;
+            
+            _enemyHitCooldowns.Clear();
+        }
+
+        // Statische Methode zum Cleanup aller Orbit-Projektile
+        public static void DespawnAllOrbitProjectiles()
+        {
+            Debug.Log($"Despawning {_allOrbitProjectiles.Count} orbit projectiles");
+            
+            // Kopie erstellen da Despawn() die Liste modifiziert
+            var projectilesToDespawn = new List<Projectile>(_allOrbitProjectiles);
+            
+            foreach (var proj in projectilesToDespawn)
+            {
+                if (proj != null && proj.gameObject != null)
+                {
+                    proj.Despawn();
+                }
+            }
+            
+            _allOrbitProjectiles.Clear();
         }
     }
 }

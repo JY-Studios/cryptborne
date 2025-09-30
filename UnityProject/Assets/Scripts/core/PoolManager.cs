@@ -82,21 +82,14 @@ public class PoolManager : MonoBehaviour
     {
         if (prefab == null) return;
         
-        // Parent für Organisation
         GameObject parent = new GameObject($"{poolName}_Pool");
         parent.transform.SetParent(transform);
         poolParents[poolName] = parent.transform;
         
-        // Queue für inaktive Objekte
         Queue<GameObject> objectPool = new Queue<GameObject>();
-        
-        // Liste für aktive Objekte
         activeObjects[poolName] = new List<GameObject>();
-        
-        // Prefab speichern für späteren Zugriff
         prefabLookup[poolName] = prefab;
         
-        // Pool füllen
         for (int i = 0; i < size; i++)
         {
             GameObject obj = Instantiate(prefab, parent.transform);
@@ -111,7 +104,6 @@ public class PoolManager : MonoBehaviour
     
     public GameObject Spawn(string poolName, Vector3 position, Quaternion rotation, GameObject fallbackPrefab = null, int defaultSize = 10)
     {
-        // Wenn der Pool nicht existiert → neu erstellen
         if (!poolDictionary.ContainsKey(poolName))
         {
             if (fallbackPrefab == null)
@@ -132,33 +124,26 @@ public class PoolManager : MonoBehaviour
         }
         else
         {
-            // Pool ist leer - expandiere automatisch
             GameObject prefab = prefabLookup[poolName];
             obj = Instantiate(prefab, poolParents[poolName]);
             obj.name = $"{poolName}_expanded_{activeObjects[poolName].Count}";
             Debug.LogWarning($"Pool '{poolName}' expanded!");
         }
     
-        // Aus Pool-Parent nehmen
         obj.transform.SetParent(null);
     
-        // CharacterController temporär disablen (wichtig für Enemies!)
         CharacterController cc = obj.GetComponent<CharacterController>();
         if (cc != null)
             cc.enabled = false;
     
-        // Position und Rotation setzen
         obj.transform.position = position;
         obj.transform.rotation = rotation;
     
-        // Component-Reset OHNE Position zu ändern
         ResetPooledObject(obj, poolName);
     
-        // CharacterController wieder enablen
         if (cc != null)
             cc.enabled = true;
     
-        // GameObject aktivieren
         obj.SetActive(true);
         activeObjects[poolName].Add(obj);
     
@@ -182,10 +167,10 @@ public class PoolManager : MonoBehaviour
         poolDictionary[poolName].Enqueue(obj);
     }
     
-    // Automatische Pool-Erkennung basierend auf GameObject
     public void DespawnAuto(GameObject obj)
     {
-        // Finde den richtigen Pool basierend auf dem Namen
+        if (obj == null) return;
+        
         foreach (var poolName in poolDictionary.Keys)
         {
             if (activeObjects[poolName].Contains(obj))
@@ -202,17 +187,10 @@ public class PoolManager : MonoBehaviour
     {
         switch (poolName)
         {
-            // case "Bullet":
-            //     Bullet bullet = obj.GetComponent<Bullet>();
-            //     if (bullet != null) bullet.ResetBullet();
-            //     break;
-            
             case "Enemy":
-                // Enemy Health reset
                 EnemyHealth health = obj.GetComponent<EnemyHealth>();
                 if (health != null) health.ResetHealth();
             
-                // Enemy State reset - OHNE Position zu ändern!
                 EnemyStateManager stateManager = obj.GetComponent<EnemyStateManager>();
                 if (stateManager != null) stateManager.ResetEnemy();
                 break;
@@ -251,5 +229,54 @@ public class PoolManager : MonoBehaviour
     public int GetPoolSize(string poolName)
     {
         return poolDictionary.ContainsKey(poolName) ? poolDictionary[poolName].Count : 0;
+    }
+    
+    // CLEANUP beim Beenden der Application/Scene
+    void OnApplicationQuit()
+    {
+        CleanupPools();
+    }
+    
+    void OnDestroy()
+    {
+        // Nur cleanup wenn dies die Instance ist
+        if (instance == this)
+        {
+            CleanupPools();
+            instance = null;
+        }
+    }
+    
+    void CleanupPools()
+    {
+        if (poolDictionary == null) return;
+        
+        // Despawn alle aktiven Objekte
+        DespawnAllPools();
+        
+        // Destroy alle Pool-Parents und ihre Children
+        foreach (var parent in poolParents.Values)
+        {
+            if (parent != null)
+            {
+                // Destroy alle Children
+                foreach (Transform child in parent)
+                {
+                    if (child != null)
+                        Destroy(child.gameObject);
+                }
+                
+                // Destroy Parent
+                Destroy(parent.gameObject);
+            }
+        }
+        
+        // Clear alle Dictionaries
+        poolDictionary.Clear();
+        poolParents.Clear();
+        activeObjects.Clear();
+        prefabLookup.Clear();
+        
+        Debug.Log("PoolManager cleaned up successfully");
     }
 }

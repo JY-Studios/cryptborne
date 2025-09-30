@@ -4,8 +4,6 @@ using UnityEngine.InputSystem;
 using Weapons;
 using Weapons.Behaviours.Ranged;
 using Weapons.Data;
-using Core.Events;
-using System.Linq;
 using Weapons.Projectiles;
 
 namespace Characters.Player
@@ -34,21 +32,14 @@ namespace Characters.Player
 
             Debug.Log($"WeaponInventory Start - Available weapons: {availableWeapons.Count}");
 
-            // Debug: Liste alle Waffen auf
-            for (int i = 0; i < availableWeapons.Count; i++)
-            {
-                if (availableWeapons[i] != null)
-                    Debug.Log($"Weapon {i}: {availableWeapons[i].weaponName}");
-            }
-
             // Erste Waffe ausrüsten
             if (availableWeapons.Count > 0)
             {
                 EquipWeapon(0);
-
-                // WICHTIG: Force initial UI update!
-                Invoke("ForceInitialUIUpdate", 0.1f);
             }
+            
+            // UI Update direkt triggern
+            TriggerUIUpdate();
         }
 
         void Update()
@@ -62,25 +53,15 @@ namespace Characters.Player
             var keyboard = Keyboard.current;
             if (keyboard == null) return;
 
-            // Dynamische Zahlentasten 1-9 für Waffenwechsel (basierend auf maxSlots)
-            if (keyboard.digit1Key.wasPressedThisFrame && availableWeapons.Count >= 1)
-                EquipWeapon(0);
-            if (keyboard.digit2Key.wasPressedThisFrame && availableWeapons.Count >= 2)
-                EquipWeapon(1);
-            if (keyboard.digit3Key.wasPressedThisFrame && availableWeapons.Count >= 3)
-                EquipWeapon(2);
-            if (keyboard.digit4Key.wasPressedThisFrame && availableWeapons.Count >= 4)
-                EquipWeapon(3);
-            if (keyboard.digit5Key.wasPressedThisFrame && availableWeapons.Count >= 5)
-                EquipWeapon(4);
-            if (keyboard.digit6Key.wasPressedThisFrame && availableWeapons.Count >= 6)
-                EquipWeapon(5);
-            if (keyboard.digit7Key.wasPressedThisFrame && availableWeapons.Count >= 7)
-                EquipWeapon(6);
-            if (keyboard.digit8Key.wasPressedThisFrame && availableWeapons.Count >= 8)
-                EquipWeapon(7);
-            if (keyboard.digit9Key.wasPressedThisFrame && availableWeapons.Count >= 9)
-                EquipWeapon(8);
+            // Dynamische Zahlentasten nur bis maxWeaponSlots
+            for (int i = 0; i < Mathf.Min(maxWeaponSlots, availableWeapons.Count); i++)
+            {
+                Key key = GetNumberKey(i + 1);
+                if (keyboard[key].wasPressedThisFrame)
+                {
+                    EquipWeapon(i);
+                }
+            }
 
             // Mausrad für Waffenwechsel
             var mouse = Mouse.current;
@@ -95,6 +76,23 @@ namespace Characters.Player
                 CycleWeapon(-1);
             if (keyboard.eKey.wasPressedThisFrame)
                 CycleWeapon(1);
+        }
+
+        Key GetNumberKey(int number)
+        {
+            switch (number)
+            {
+                case 1: return Key.Digit1;
+                case 2: return Key.Digit2;
+                case 3: return Key.Digit3;
+                case 4: return Key.Digit4;
+                case 5: return Key.Digit5;
+                case 6: return Key.Digit6;
+                case 7: return Key.Digit7;
+                case 8: return Key.Digit8;
+                case 9: return Key.Digit9;
+                default: return Key.Digit1;
+            }
         }
 
         void HandleWeaponShooting()
@@ -112,6 +110,16 @@ namespace Characters.Player
         {
             if (index < 0 || index >= availableWeapons.Count) return;
             if (availableWeapons[index] == null) return;
+
+            // WICHTIG: Prevent re-equipping the same weapon
+            if (index == currentWeaponIndex && currentWeapon != null)
+            {
+                Debug.Log($"Weapon {availableWeapons[index].weaponName} is already equipped. Ignoring.");
+                return;
+            }
+
+            // WICHTIG: Cleanup ALLE Orbit-Projektile BEVOR neue Waffe equipped wird
+            CleanupOrbitProjectiles();
 
             currentWeaponIndex = index;
             currentWeaponData = availableWeapons[index];
@@ -138,10 +146,18 @@ namespace Characters.Player
             // Orbit-Waffen einmal spawnen
             if (isOrbitWeapon)
             {
+                Debug.Log("Spawning orbit projectiles...");
                 behavior.Attack(currentWeaponData, transform);
             }
 
             OnWeaponSwitched?.Invoke(currentWeaponData, currentWeaponIndex);
+        }
+
+        void CleanupOrbitProjectiles()
+        {
+            // Benutze die statische Methode aus Projectile.cs
+            Debug.Log("Cleaning up orbit projectiles via static method...");
+            Projectile.DespawnAllOrbitProjectiles();
         }
 
         void CycleWeapon(int direction)
@@ -168,7 +184,7 @@ namespace Characters.Player
             }
 
             availableWeapons.Add(weaponData);
-            OnWeaponInventoryChanged?.Invoke(availableWeapons, currentWeaponIndex);
+            TriggerUIUpdate();
         }
 
         public void RemoveWeapon(int index)
@@ -183,19 +199,24 @@ namespace Characters.Player
                 EquipWeapon(availableWeapons.Count - 1);
             }
 
-            OnWeaponInventoryChanged?.Invoke(availableWeapons, currentWeaponIndex);
+            TriggerUIUpdate();
         }
 
-        void ForceInitialUIUpdate()
+        void TriggerUIUpdate()
         {
-            Debug.Log("Forcing initial UI update!");
+            Debug.Log("Triggering UI update");
             OnWeaponInventoryChanged?.Invoke(availableWeapons, currentWeaponIndex);
 
             if (currentWeaponData != null)
             {
-                Debug.Log($"Current weapon: {currentWeaponData.weaponName}");
                 OnWeaponSwitched?.Invoke(currentWeaponData, currentWeaponIndex);
             }
+        }
+
+        void OnDestroy()
+        {
+            // Cleanup beim Destroy
+            CleanupOrbitProjectiles();
         }
     }
 }
