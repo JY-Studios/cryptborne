@@ -5,6 +5,7 @@ using Weapons.Data;
 using Weapons.Projectiles;
 using Weapons.Projectiles.Effects;
 using Weapons.VFX;
+using Weapons.Audio;
 
 namespace Weapons.Behaviours.Ranged
 {
@@ -64,8 +65,9 @@ namespace Weapons.Behaviours.Ranged
             // Normale Projektile
             Vector3 baseSpawnPos = player.position + baseDir;
             
-            // MUZZLE FLASH spawnen beim Schießen
+            // MUZZLE FLASH und SOUND spawnen beim Schießen
             VFXManager.SpawnMuzzleFlash(baseSpawnPos, baseDir);
+            SoundManager.Instance.PlayShootSound();
             
             Vector3[] directions;
             Vector3[] spawnPositions;
@@ -92,8 +94,9 @@ namespace Weapons.Behaviours.Ranged
         {
             float orbitStep = 360f / config.count;
             
-            // Spawn-Effekt in der Mitte (nur einmal für alle Orbit-Projektile)
+            // Spawn-Effekt und Sound in der Mitte (nur einmal für alle Orbit-Projektile)
             VFXManager.SpawnMuzzleFlash(player.position, player.forward);
+            SoundManager.Instance.PlayShootSound();
             
             for (int i = 0; i < config.count; i++)
             {

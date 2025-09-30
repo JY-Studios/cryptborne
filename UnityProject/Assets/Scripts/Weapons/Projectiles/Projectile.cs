@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Weapons.VFX;
+using Weapons.Audio;
 
 namespace Weapons.Projectiles
 {
@@ -179,9 +180,10 @@ namespace Weapons.Projectiles
                 _hasHit = true;
                 _effect?.OnHit(other.gameObject, this);
                 
-                // Impact Particle spawnen
+                // Impact VFX und Sound spawnen
                 Debug.Log($"Spawning impact effect at {impactPosition}");
                 VFXManager.SpawnImpactEffect(impactPosition, impactNormal);
+                SoundManager.Instance.PlayImpactSound();
                 
                 Despawn();
                 return;
@@ -194,9 +196,10 @@ namespace Weapons.Projectiles
             {
                 _effect?.OnHit(enemy, this);
                 
-                // Impact Particle spawnen auch für Orbit-Projektile
+                // Impact VFX und Sound spawnen auch für Orbit-Projektile
                 Debug.Log($"Spawning impact effect (orbit) at {impactPosition}");
                 VFXManager.SpawnImpactEffect(impactPosition, impactNormal);
+                SoundManager.Instance.PlayImpactSound();
                 
                 RegisterHit(enemy);
             }
