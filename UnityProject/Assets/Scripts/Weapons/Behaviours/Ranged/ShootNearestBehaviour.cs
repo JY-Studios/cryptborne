@@ -100,7 +100,6 @@ namespace Weapons.Behaviours.Ranged
                 float startAngle = (orbitStep * i) + config.orbitStartAngle;
                 float angleRad = startAngle * Mathf.Deg2Rad;
                 
-                // Initiale Position im Kreis um den Spieler berechnen
                 Vector3 offset = new Vector3(
                     Mathf.Cos(angleRad) * config.orbitRadius,
                     0f,
@@ -108,7 +107,6 @@ namespace Weapons.Behaviours.Ranged
                 );
                 Vector3 spawnPos = player.position + offset;
                 
-                // Tangentiale Rotation für visuellen Effekt
                 float tangentAngle = startAngle + 90f;
                 Quaternion rotation = Quaternion.Euler(0f, tangentAngle, 0f);
                 
@@ -135,7 +133,6 @@ namespace Weapons.Behaviours.Ranged
             switch (config.pattern)
             {
                 case SpreadPattern.None:
-                    // Kein Spread - präziser Schuss (Sniper)
                     for (int i = 0; i < config.count; i++)
                     {
                         directions[i] = baseDir;
@@ -144,7 +141,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                 
                 case SpreadPattern.Random:
-                    // Zufällige Streuung (Machinegun)
                     for (int i = 0; i < config.count; i++)
                     {
                         float angleY = Random.Range(-config.spread * 0.5f, config.spread * 0.5f);
@@ -156,7 +152,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Cone:
-                    // Gleichmäßiger Kegel (Shotgun)
                     float angleStep = config.count > 1 
                         ? config.spread / (config.count - 1) 
                         : 0;
@@ -165,7 +160,7 @@ namespace Weapons.Behaviours.Ranged
                     for (int i = 0; i < config.count; i++)
                     {
                         float angle = startAngle + (angleStep * i);
-                        angle += Random.Range(-1f, 1f); // Kleine Variation für Realismus
+                        angle += Random.Range(-1f, 1f);
                         Quaternion rot = Quaternion.Euler(0, angle, 0);
                         directions[i] = rot * baseDir;
                         spawnPositions[i] = baseSpawnPos;
@@ -173,7 +168,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Horizontal:
-                    // Horizontale Linie
                     float hStep = config.count > 1 
                         ? config.spread / (config.count - 1) 
                         : 0;
@@ -189,7 +183,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Vertical:
-                    // Vertikale Linie
                     float vStep = config.count > 1 
                         ? config.spread / (config.count - 1) 
                         : 0;
@@ -205,7 +198,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Radial:
-                    // 360° gleichmäßig verteilt nach außen (AoE Magic)
                     float radialStep = 360f / config.count;
                     
                     for (int i = 0; i < config.count; i++)
@@ -218,7 +210,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Orbit:
-                    // Sollte nie hier ankommen, wird separat gehandhabt
                     Debug.LogWarning("Orbit pattern should be handled separately!");
                     for (int i = 0; i < config.count; i++)
                     {
@@ -228,7 +219,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 case SpreadPattern.Spiral:
-                    // Spiralförmig rotierend (Wirbel-Effekt)
                     float spiralStep = 360f / config.count;
                     float spiralSpread = config.spread / config.count;
                     
@@ -240,7 +230,6 @@ namespace Weapons.Behaviours.Ranged
                         Quaternion rot = Quaternion.Euler(0, angle, 0);
                         Vector3 spiralDir = rot * baseDir;
                         
-                        // Zusätzliche Streuung für Spiral-Effekt
                         Quaternion spreadRot = Quaternion.Euler(0, currentSpread, 0);
                         directions[i] = spreadRot * spiralDir;
                         spawnPositions[i] = baseSpawnPos;
@@ -248,7 +237,6 @@ namespace Weapons.Behaviours.Ranged
                     break;
                     
                 default:
-                    // Fallback auf None
                     for (int i = 0; i < config.count; i++)
                     {
                         directions[i] = baseDir;

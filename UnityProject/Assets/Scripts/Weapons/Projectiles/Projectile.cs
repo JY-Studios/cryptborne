@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Weapons.VFX;
 
 namespace Weapons.Projectiles
 {
@@ -27,7 +28,7 @@ namespace Weapons.Projectiles
         // Public Property für Tracking
         public bool IsOrbiting => _isOrbiting;
 
-        // STATISCHE LISTE aller aktiven Orbit-Projektile (für einfaches Tracking)
+        // STATISCHE LISTE aller aktiven Orbit-Projektile
         private static List<Projectile> _allOrbitProjectiles = new List<Projectile>();
         public static List<Projectile> AllOrbitProjectiles => _allOrbitProjectiles;
 
@@ -69,7 +70,6 @@ namespace Weapons.Projectiles
                 _rb.isKinematic = true;
             }
 
-            // Zur globalen Liste hinzufügen
             if (!_allOrbitProjectiles.Contains(this))
             {
                 _allOrbitProjectiles.Add(this);
@@ -165,21 +165,39 @@ namespace Weapons.Projectiles
         {
             if (!other.CompareTag("Enemy")) return;
             
+            Debug.Log($"Projectile hit enemy: {other.gameObject.name}");
+            
+            // Impact Position berechnen
+            Vector3 impactPosition = transform.position;
+            Vector3 impactNormal = (transform.position - other.transform.position).normalized;
+            
+            // Normale Projektile: Einmal treffen und despawnen
             if (!_isOrbiting)
             {
                 if (_hasHit) return;
                 
                 _hasHit = true;
                 _effect?.OnHit(other.gameObject, this);
+                
+                // Impact Particle spawnen
+                Debug.Log($"Spawning impact effect at {impactPosition}");
+                VFXManager.SpawnImpactEffect(impactPosition, impactNormal);
+                
                 Despawn();
                 return;
             }
             
+            // Orbit-Projektile: Hit-Cooldown System
             GameObject enemy = other.gameObject;
             
             if (CanHitEnemy(enemy))
             {
                 _effect?.OnHit(enemy, this);
+                
+                // Impact Particle spawnen auch für Orbit-Projektile
+                Debug.Log($"Spawning impact effect (orbit) at {impactPosition}");
+                VFXManager.SpawnImpactEffect(impactPosition, impactNormal);
+                
                 RegisterHit(enemy);
             }
         }
@@ -219,7 +237,6 @@ namespace Weapons.Projectiles
         {
             _hasHit = true;
             
-            // Aus globaler Liste entfernen wenn Orbit
             if (_isOrbiting)
             {
                 _allOrbitProjectiles.Remove(this);
@@ -246,7 +263,6 @@ namespace Weapons.Projectiles
                 _rb.isKinematic = false;
             }
 
-            // Aus globaler Liste entfernen falls noch drin
             if (_isOrbiting)
             {
                 _allOrbitProjectiles.Remove(this);
@@ -268,12 +284,10 @@ namespace Weapons.Projectiles
             _enemyHitCooldowns.Clear();
         }
 
-        // Statische Methode zum Cleanup aller Orbit-Projektile
         public static void DespawnAllOrbitProjectiles()
         {
             Debug.Log($"Despawning {_allOrbitProjectiles.Count} orbit projectiles");
             
-            // Kopie erstellen da Despawn() die Liste modifiziert
             var projectilesToDespawn = new List<Projectile>(_allOrbitProjectiles);
             
             foreach (var proj in projectilesToDespawn)

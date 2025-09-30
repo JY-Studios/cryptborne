@@ -25,7 +25,6 @@ namespace Weapons.VFX
                 {
                     ps.Play();
                     
-                    // Auto-Despawn nach Particle Lifetime
                     float lifetime = ps.main.duration + ps.main.startLifetime.constantMax;
                     CoroutineHelper.Instance.DelayedAction(() =>
                     {
@@ -41,6 +40,8 @@ namespace Weapons.VFX
         /// </summary>
         public static void SpawnImpactEffect(Vector3 position, Vector3 normal)
         {
+            Debug.Log($"VFXManager: Attempting to spawn ImpactEffect at {position}");
+            
             GameObject impact = PoolManager.Instance.Spawn(
                 poolName: "ImpactEffect",
                 position: position,
@@ -49,18 +50,35 @@ namespace Weapons.VFX
 
             if (impact != null)
             {
+                Debug.Log($"VFXManager: ImpactEffect spawned successfully: {impact.name}");
+                
                 ParticleSystem ps = impact.GetComponent<ParticleSystem>();
                 if (ps != null)
                 {
+                    Debug.Log($"VFXManager: Playing particle system");
+                    ps.Clear();
                     ps.Play();
                     
                     float lifetime = ps.main.duration + ps.main.startLifetime.constantMax;
+                    Debug.Log($"VFXManager: Impact will despawn in {lifetime}s");
+                    
                     CoroutineHelper.Instance.DelayedAction(() =>
                     {
                         if (impact != null)
+                        {
+                            Debug.Log("VFXManager: Despawning impact effect");
                             PoolManager.Instance.DespawnAuto(impact);
+                        }
                     }, lifetime);
                 }
+                else
+                {
+                    Debug.LogError("VFXManager: ImpactEffect has no ParticleSystem component!");
+                }
+            }
+            else
+            {
+                Debug.LogError("VFXManager: Failed to spawn ImpactEffect from pool! Make sure 'ImpactEffect' is added to PoolManager.");
             }
         }
     }
