@@ -135,7 +135,7 @@ MonoBehaviour:
   detectionRange: 8
   attackRange: 1.5
   separationRadius: 1
-  attackDamage: 1
+  attackDamage: 10
   attackCooldown: 1.5
   nextAttackTime: 0
 --- !u!143 &-3013802375287924253
@@ -175,6 +175,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08050396359d44f3ea0ee2e68f9af880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  maxHealth: 2
+  maxHealth: 40
   currentHealth: 0
   damageColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

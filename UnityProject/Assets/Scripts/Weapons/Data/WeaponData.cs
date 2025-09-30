@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using UnityEngine;
-using Weapons.Projectiles;
 
 namespace Weapons.Data
 {
@@ -11,7 +9,7 @@ namespace Weapons.Data
         public FireMode fireMode;
 
         [Header("Stats")]
-        public float damage;
+        public int damage; // Integer statt float
         public float attackSpeed;
 
         [Header("Visuals")]

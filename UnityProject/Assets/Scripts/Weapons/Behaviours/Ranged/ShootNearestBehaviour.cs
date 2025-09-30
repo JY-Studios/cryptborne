@@ -86,7 +86,7 @@ namespace Weapons.Behaviours.Ranged
 
                 var proj = go.GetComponent<Projectile>();
                 proj.ResetProjectile();
-                proj.Init(config, directions[i], new DamageEffect(baseDamage));
+                proj.Init(config, directions[i], new DamageEffect((int)baseDamage));
             }
         }
         
@@ -123,7 +123,7 @@ namespace Weapons.Behaviours.Ranged
 
                 var proj = go.GetComponent<Projectile>();
                 proj.ResetProjectile();
-                proj.InitOrbit(config, startAngle, player, new DamageEffect(baseDamage));
+                proj.InitOrbit(config, startAngle, player, new DamageEffect((int)baseDamage));
             }
         }
 

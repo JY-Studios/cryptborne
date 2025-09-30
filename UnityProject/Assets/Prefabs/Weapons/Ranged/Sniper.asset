@@ -15,7 +15,7 @@ MonoBehaviour:
   weaponName: Sniper
   icon: {fileID: 0}
   fireMode: 2
-  damage: 5
+  damage: 50
   attackSpeed: 3
   weaponPrefab: {fileID: 0}
   detectionRange: 20

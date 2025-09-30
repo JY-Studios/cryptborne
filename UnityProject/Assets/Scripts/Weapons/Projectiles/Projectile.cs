@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Weapons.VFX;
 using Weapons.Audio;
+using UI;
 
 namespace Weapons.Projectiles
 {
@@ -172,6 +173,9 @@ namespace Weapons.Projectiles
             Vector3 impactPosition = transform.position;
             Vector3 impactNormal = (transform.position - other.transform.position).normalized;
             
+            // Damage aus Effect extrahieren
+            int damageDealt = GetDamageFromEffect();
+            
             // Normale Projektile: Einmal treffen und despawnen
             if (!_isOrbiting)
             {
@@ -180,10 +184,10 @@ namespace Weapons.Projectiles
                 _hasHit = true;
                 _effect?.OnHit(other.gameObject, this);
                 
-                // Impact VFX und Sound spawnen
-                Debug.Log($"Spawning impact effect at {impactPosition}");
+                // Impact VFX, Sound und Damage Number spawnen
                 VFXManager.SpawnImpactEffect(impactPosition, impactNormal);
                 SoundManager.Instance.PlayImpactSound();
+                DamageNumberManager.Instance.ShowDamage(impactPosition, damageDealt);
                 
                 Despawn();
                 return;
@@ -196,13 +200,23 @@ namespace Weapons.Projectiles
             {
                 _effect?.OnHit(enemy, this);
                 
-                // Impact VFX und Sound spawnen auch für Orbit-Projektile
-                Debug.Log($"Spawning impact effect (orbit) at {impactPosition}");
+                // Impact VFX, Sound und Damage Number spawnen auch für Orbit-Projektile
                 VFXManager.SpawnImpactEffect(impactPosition, impactNormal);
                 SoundManager.Instance.PlayImpactSound();
+                DamageNumberManager.Instance.ShowDamage(impactPosition, damageDealt);
                 
                 RegisterHit(enemy);
             }
+        }
+        
+        // Helper um Damage aus Effect zu extrahieren
+        private int GetDamageFromEffect()
+        {
+            if (_effect is Weapons.Projectiles.Effects.DamageEffect damageEffect)
+            {
+                return damageEffect.Damage;
+            }
+            return 0;
         }
 
         private bool CanHitEnemy(GameObject enemy)

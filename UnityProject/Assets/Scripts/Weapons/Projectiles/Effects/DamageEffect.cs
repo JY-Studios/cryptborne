@@ -5,9 +5,11 @@ namespace Weapons.Projectiles.Effects
 {
     public class DamageEffect : IProjectileEffect
     {
-        private float damage;
+        private int damage; // Integer statt float
 
-        public DamageEffect(float damage)
+        public int Damage => damage; // Integer Property
+
+        public DamageEffect(int damage)
         {
             this.damage = damage;
         }

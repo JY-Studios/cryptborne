@@ -6,8 +6,8 @@ namespace Characters.Enemies
     public class EnemyHealth : MonoBehaviour
     {
         [Header("Health")] 
-        public int maxHealth = 2;
-        public float currentHealth;
+        public int maxHealth = 40; // Standard Enemy
+        public int currentHealth;
 
         [Header("Visual Feedback")] 
         public Color damageColor = Color.yellow;
@@ -16,7 +16,6 @@ namespace Characters.Enemies
 
         private EnemyStateManager stateManager;
         
-        // Constants
         private const float DAMAGE_FLASH_DURATION = 0.1f;
 
         void Start()
@@ -26,7 +25,6 @@ namespace Characters.Enemies
 
         void OnEnable()
         {
-            // Wird beim Pool-Recycling aufgerufen
             Initialize();
         }
 
@@ -60,16 +58,15 @@ namespace Characters.Enemies
             }
         }
 
-        public void TakeDamage(float damage)
+        public void TakeDamage(int damage)
         {
-            if (currentHealth <= 0) return; // Bereits tot
+            if (currentHealth <= 0) return;
             
             currentHealth -= damage;
             currentHealth = Mathf.Max(0, currentHealth);
             
             Debug.Log($"Enemy {gameObject.name} hit! Health: {currentHealth}/{maxHealth}");
             
-            // Event auslösen
             GameEvents.EnemyDamaged(gameObject, damage);
 
             if (enemyRenderer != null)
@@ -86,7 +83,7 @@ namespace Characters.Enemies
                 enemyRenderer.material.color = damageColor;
                 yield return new WaitForSeconds(DAMAGE_FLASH_DURATION);
                 
-                if (enemyRenderer != null) // Nochmal checken nach Wait
+                if (enemyRenderer != null)
                     enemyRenderer.material.color = originalColor;
             }
         }
@@ -97,12 +94,10 @@ namespace Characters.Enemies
             
             if (stateManager != null)
             {
-                // State Manager übernimmt und löst das Event aus
                 stateManager.SwitchState(stateManager.deadState);
             }
             else
             {
-                // Falls kein StateManager, direkt Event und Pool
                 GameEvents.EnemyDied(gameObject);
                 ReturnToPool();
             }
@@ -113,8 +108,7 @@ namespace Characters.Enemies
             PoolManager.Instance.Despawn("Enemy", gameObject);
         }
         
-        // Public Getters
-        public float GetHealthPercentage() => currentHealth / maxHealth;
+        public float GetHealthPercentage() => (float)currentHealth / maxHealth;
         public bool IsAlive() => currentHealth > 0;
         public bool IsDamaged() => currentHealth < maxHealth;
     }
