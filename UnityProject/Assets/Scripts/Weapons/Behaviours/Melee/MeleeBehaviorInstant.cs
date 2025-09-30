@@ -14,24 +14,26 @@ namespace Weapons.Behaviours.Melee
             this.targetTag = targetTag;
         }
 
-        public void Attack(MeleeWeaponData data, Transform player)
+        public bool Attack(MeleeWeaponData data, Transform player)
         {
             var position = player.position;
             var direction = player.forward;
             
             Collider[] hits = Physics.OverlapSphere(position, data.radius);
             var alreadyHit = new HashSet<GameObject>();
+            bool hitSomething = false;
 
             foreach (var c in hits)
             {
                 var go = c.gameObject;
-                if (!go.CompareTag(targetTag)) continue; // nur Objekte mit diesem Tag
+                if (!go.CompareTag(targetTag)) continue;
                 if (alreadyHit.Contains(go)) continue;
 
                 var dirToTarget = (c.transform.position - position).normalized;
                 if (Vector3.Angle(direction, dirToTarget) <= data.arcAngle * 0.5f)
                 {
                     alreadyHit.Add(go);
+                    hitSomething = true;
 
                     var health = go.GetComponent<EnemyHealth>();
                     if (health != null) health.TakeDamage(data.damage);
@@ -43,6 +45,8 @@ namespace Weapons.Behaviours.Melee
 
             if (data.weaponPrefab != null)
                 GameObject.Instantiate(data.weaponPrefab, position, Quaternion.LookRotation(direction));
+
+            return hitSomething; // True wenn mindestens ein Target getroffen wurde
         }
     }
 }

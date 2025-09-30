@@ -21,10 +21,16 @@ namespace Characters.Player
 
         private Weapon<RangedWeaponData> currentWeapon;
         private PlayerController playerController;
+        
+        // Cooldown Tracking für jede Waffe
+        private Dictionary<int, float> weaponLastAttackTimes = new Dictionary<int, float>();
 
         // Events für UI Updates
         public static event System.Action<List<RangedWeaponData>, int> OnWeaponInventoryChanged;
         public static event System.Action<RangedWeaponData, int> OnWeaponSwitched;
+        
+        // Public Properties für UI
+        public int WeaponCount => availableWeapons.Count;
 
         void Start()
         {
@@ -103,7 +109,41 @@ namespace Characters.Player
             if (isOrbitWeapon) return;
 
             bool inputPressed = Mouse.current != null && Mouse.current.leftButton.isPressed;
-            currentWeapon.TryAttack(transform, inputPressed);
+            
+            // Attack versuchen und bei Erfolg Cooldown tracken
+            bool didAttack = currentWeapon.TryAttack(transform, inputPressed);
+            if (didAttack)
+            {
+                weaponLastAttackTimes[currentWeaponIndex] = Time.time;
+            }
+        }
+        
+        /// <summary>
+        /// Gibt den Cooldown Progress für eine Waffe zurück (0 = ready, 1 = full cooldown)
+        /// </summary>
+        public float GetWeaponCooldownProgress(int weaponIndex)
+        {
+            if (weaponIndex < 0 || weaponIndex >= availableWeapons.Count)
+                return 0f;
+            
+            RangedWeaponData weaponData = availableWeapons[weaponIndex];
+            if (weaponData == null)
+                return 0f;
+            
+            // Wenn Waffe noch nie benutzt wurde
+            if (!weaponLastAttackTimes.ContainsKey(weaponIndex))
+                return 0f;
+            
+            float lastAttackTime = weaponLastAttackTimes[weaponIndex];
+            float cooldownDuration = weaponData.attackSpeed;
+            float timeSinceLastAttack = Time.time - lastAttackTime;
+            
+            if (timeSinceLastAttack >= cooldownDuration)
+                return 0f; // Cooldown fertig
+            
+            // Cooldown Progress: 1 (gerade geschossen) -> 0 (bereit)
+            float progress = 1f - (timeSinceLastAttack / cooldownDuration);
+            return Mathf.Clamp01(progress);
         }
 
         void EquipWeapon(int index)
@@ -126,6 +166,12 @@ namespace Characters.Player
 
             var behavior = new ShootNearestBehaviour();
             currentWeapon = new Weapon<RangedWeaponData>(currentWeaponData, behavior);
+            
+            // Initialize last attack time für neue Waffe (als ob gerade geschossen)
+            if (!weaponLastAttackTimes.ContainsKey(index))
+            {
+                weaponLastAttackTimes[index] = Time.time - currentWeaponData.attackSpeed; // Sofort bereit
+            }
 
             Debug.Log($"Equipped weapon: {currentWeaponData.weaponName}");
 

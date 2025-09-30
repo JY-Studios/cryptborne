@@ -15,33 +15,44 @@ namespace Weapons
         {
             _data = data;
             _behavior = behavior;
-            _lastAttackTime = Time.time - data.attackSpeed - 1f; // Sicherstellen dass Cooldown ready ist
+            _lastAttackTime = Time.time - data.attackSpeed - 1f;
         }
         
         private bool CooldownReady => Time.time >= _lastAttackTime + _data.attackSpeed;
         
-        public void TryAttack(Transform player, bool inputPressed)
+        /// <summary>
+        /// Versucht zu attackieren. Gibt true zurück wenn Attack erfolgreich war.
+        /// </summary>
+        public bool TryAttack(Transform player, bool inputPressed)
         {
+            bool shouldTryAttack = false;
+            
             switch (_data.fireMode)
             {
                 case FireMode.Manual:
-                    if (inputPressed && CooldownReady) Attack(player);
+                    shouldTryAttack = inputPressed && CooldownReady;
                     break;
 
                 case FireMode.AutoHold:
-                    if (inputPressed && CooldownReady) Attack(player);
+                    shouldTryAttack = inputPressed && CooldownReady;
                     break;
 
                 case FireMode.AutoFire:
-                    if (CooldownReady) Attack(player);
+                    shouldTryAttack = CooldownReady;
                     break;
             }
-        }
-
-        private void Attack(Transform player)
-        {
-            _behavior.Attack(_data, player);
-            _lastAttackTime = Time.time;
+            
+            if (shouldTryAttack)
+            {
+                bool didAttack = _behavior.Attack(_data, player);
+                if (didAttack)
+                {
+                    _lastAttackTime = Time.time;
+                    return true;
+                }
+            }
+            
+            return false;
         }
     }
 }

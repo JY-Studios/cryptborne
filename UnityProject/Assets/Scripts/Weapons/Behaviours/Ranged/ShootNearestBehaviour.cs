@@ -11,9 +11,7 @@ namespace Weapons.Behaviours.Ranged
 {
     public class ShootNearestBehaviour : IWeaponBehavior<RangedWeaponData>
     {
-        private float _nextShootTime = 0f;
-
-        public void Attack(RangedWeaponData data, Transform player)
+        public bool Attack(RangedWeaponData data, Transform player)
         {
             // Prüfe ob es Orbit-Projektile gibt - diese brauchen KEIN Target!
             bool hasOrbitProjectiles = data.projectiles.Any(p => p.pattern == SpreadPattern.Orbit);
@@ -28,7 +26,7 @@ namespace Weapons.Behaviours.Ranged
                         SpawnProjectiles(projectile, player, Vector3.forward, data.damage);
                     }
                 }
-                return;
+                return true; // Orbit-Projektile wurden gespawnt
             }
             
             // Normale Waffen brauchen ein Target
@@ -41,7 +39,7 @@ namespace Weapons.Behaviours.Ranged
                 .FirstOrDefault();
             
             if (!nearestEnemy)
-                return;
+                return false; // Kein Target gefunden, nicht geschossen!
             
             Vector3 dir = (nearestEnemy.transform.position - player.position).normalized;
             dir.y = 0f;
@@ -51,6 +49,8 @@ namespace Weapons.Behaviours.Ranged
             {
                 SpawnProjectiles(projectile, player, dir, data.damage);
             }
+            
+            return true; // Erfolgreich geschossen!
         }
 
         private void SpawnProjectiles(ProjectileConfig config, Transform player, Vector3 baseDir, float baseDamage)

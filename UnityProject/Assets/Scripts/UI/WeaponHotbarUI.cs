@@ -21,18 +21,17 @@ public class WeaponHotbarUI : MonoBehaviour
     private List<Image> weaponIcons = new List<Image>();
     private List<TextMeshProUGUI> slotNumbers = new List<TextMeshProUGUI>();
     private List<TextMeshProUGUI> weaponNames = new List<TextMeshProUGUI>();
+    private List<Image> cooldownOverlays = new List<Image>();
     private bool isInitialized = false;
     
     void OnEnable()
     {
-        // Slots SOFORT erstellen bevor Events subscribed werden
         if (!isInitialized)
         {
             CreateSlots();
             isInitialized = true;
         }
         
-        // Jetzt Events subscriben - UI ist ready
         WeaponInventory.OnWeaponSwitched += OnWeaponSwitched;
         WeaponInventory.OnWeaponInventoryChanged += OnInventoryChanged;
     }
@@ -43,9 +42,13 @@ public class WeaponHotbarUI : MonoBehaviour
         WeaponInventory.OnWeaponInventoryChanged -= OnInventoryChanged;
     }
     
+    void Update()
+    {
+        UpdateCooldowns();
+    }
+    
     void CreateSlots()
     {
-        // Lösche alte Slots
         foreach (var slot in slotObjects)
         {
             if (slot != null)
@@ -56,14 +59,13 @@ public class WeaponHotbarUI : MonoBehaviour
         weaponIcons.Clear();
         slotNumbers.Clear();
         weaponNames.Clear();
+        cooldownOverlays.Clear();
         
-        // Erstelle neue Slots
         for (int i = 0; i < maxSlots; i++)
         {
             GameObject slot = Instantiate(slotPrefab, slotsContainer);
             slotObjects.Add(slot);
             
-            // Finde UI Komponenten
             Image bg = slot.GetComponent<Image>();
             slotBackgrounds.Add(bg);
             
@@ -80,21 +82,63 @@ public class WeaponHotbarUI : MonoBehaviour
             TextMeshProUGUI name = slot.transform.Find("Name")?.GetComponent<TextMeshProUGUI>();
             weaponNames.Add(name);
             
-            // Initial als leer markieren
+            // Cooldown Overlay Setup - minimal, behält Prefab Settings bei
+            Transform cooldownTransform = slot.transform.Find("CooldownOverlay");
+            if (cooldownTransform != null)
+            {
+                Image cooldownOverlay = cooldownTransform.GetComponent<Image>();
+                if (cooldownOverlay != null)
+                {
+                    RectTransform cooldownRect = cooldownTransform as RectTransform;
+                    if (cooldownRect != null)
+                    {
+                        // Nur Pivot und Initial Scale setzen, Rest vom Prefab
+                        cooldownRect.pivot = new Vector2(0.5f, 1f); // Pivot oben
+                        cooldownRect.localScale = new Vector3(1f, 0f, 1f); // Initial unsichtbar
+                    }
+                }
+                cooldownOverlays.Add(cooldownOverlay);
+            }
+            else
+            {
+                Debug.LogWarning($"WeaponHotbarUI: Slot {i} has no CooldownOverlay!");
+                cooldownOverlays.Add(null);
+            }
+            
             if (weaponIcons[i] != null)
                 weaponIcons[i].gameObject.SetActive(false);
             if (weaponNames[i] != null)
                 weaponNames[i].text = "Empty";
         }
         
-        Debug.Log($"WeaponHotbarUI: Created {maxSlots} slots");
+        Debug.Log($"WeaponHotbarUI: Created {maxSlots} slots with cooldown tracking");
+    }
+    
+    void UpdateCooldowns()
+    {
+        var inventory = FindObjectOfType<WeaponInventory>();
+        if (inventory == null) return;
+        
+        for (int i = 0; i < cooldownOverlays.Count && i < inventory.WeaponCount; i++)
+        {
+            if (cooldownOverlays[i] != null)
+            {
+                float cooldownProgress = inventory.GetWeaponCooldownProgress(i);
+                
+                RectTransform rectTransform = cooldownOverlays[i].transform as RectTransform;
+                if (rectTransform != null)
+                {
+                    // Scale Y: 1.0 = voll im Cooldown, 0.0 = bereit
+                    rectTransform.localScale = new Vector3(1f, cooldownProgress, 1f);
+                }
+            }
+        }
     }
     
     void OnWeaponSwitched(RangedWeaponData weapon, int index)
     {
         if (!isInitialized) return;
         
-        // Update selected slot visual
         for (int i = 0; i < slotBackgrounds.Count; i++)
         {
             if (slotBackgrounds[i] != null)
@@ -102,8 +146,6 @@ public class WeaponHotbarUI : MonoBehaviour
                 slotBackgrounds[i].color = (i == index) ? selectedColor : normalColor;
             }
         }
-        
-        Debug.Log($"WeaponHotbarUI: Switched to slot {index} - {weapon.weaponName}");
     }
     
     void OnInventoryChanged(List<RangedWeaponData> weapons, int currentIndex)
@@ -114,12 +156,10 @@ public class WeaponHotbarUI : MonoBehaviour
             return;
         }
         
-        // Update alle Slots
         for (int i = 0; i < maxSlots; i++)
         {
             if (i < weapons.Count && weapons[i] != null)
             {
-                // Slot hat eine Waffe
                 if (weaponIcons[i] != null)
                 {
                     weaponIcons[i].gameObject.SetActive(true);
@@ -138,7 +178,6 @@ public class WeaponHotbarUI : MonoBehaviour
             }
             else
             {
-                // Leerer Slot
                 if (i < slotObjects.Count)
                 {
                     if (weaponIcons[i] != null)
@@ -150,6 +189,5 @@ public class WeaponHotbarUI : MonoBehaviour
         }
         
         OnWeaponSwitched(weapons[currentIndex], currentIndex);
-        Debug.Log($"WeaponHotbarUI: Inventory updated - {weapons.Count} weapons");
     }
 }
