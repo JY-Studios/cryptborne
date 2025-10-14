@@ -1691,13 +1691,14 @@ MonoBehaviour:
   floorTile2: {fileID: 919132149155446097, guid: 520f45616af8c4550aca3b08572972b1, type: 3}
   floorTile3: {fileID: 919132149155446097, guid: 395e63dbf556f4ebfa3e7618467a9893, type: 3}
   wallNormal: {fileID: 919132149155446097, guid: 46f5618e03e4c438e95f04ee732f7b15, type: 3}
-  wallCorner: {fileID: 919132149155446097, guid: bb8be00daa0b946f7baec52e89e1e21d, type: 3}
+  wallCorner: {fileID: 919132149155446097, guid: 59bda19f9d1ef4dbea7ef8eee2bd0331, type: 3}
   wallDoorway: {fileID: 919132149155446097, guid: 5e3d244c5af3d46e8bd624fbcac83d90, type: 3}
   barrel: {fileID: 919132149155446097, guid: 48049821883fe47fa8740943bc2d014e, type: 3}
   crate: {fileID: 919132149155446097, guid: 2a058318a3a724b6ebe67a9f6dcee84e, type: 3}
   pillar: {fileID: 919132149155446097, guid: 30a1cdce646924f8988b21b1ad0b3157, type: 3}
   torch: {fileID: 919132149155446097, guid: ca293b38340bb435b9175bcc07ef8980, type: 3}
   banner: {fileID: 919132149155446097, guid: 30e237a8599fb4c539e7e9fa6348c60f, type: 3}
+  spawnBanners: 0
   northDoor: 1
   southDoor: 0
   eastDoor: 0
@@ -1706,6 +1707,7 @@ MonoBehaviour:
   roomDepth: 30
   tileSize: 4
   propDensity: 0.1
+  wallDecoDensity: 0.2
 --- !u!4 &1664958384
 Transform:
   m_ObjectHideFlags: 0
