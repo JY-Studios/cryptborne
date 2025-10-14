@@ -1687,16 +1687,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30a440ec1c46e48f68ebc6e3e76bfa33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularRoomBuilder
-  wallModule: {fileID: 3432845640479640443, guid: ce033fee5ecb847a999680e9b0227e42, type: 3}
-  floorModule: {fileID: 6168866094691769559, guid: 58c7f2e1ed4044b2db074b7999f1fa61, type: 3}
-  cornerModule: {fileID: 7994417696834692595, guid: 801511ef5bdd44eb38854e6f3c96ebe9, type: 3}
-  doorModule: {fileID: 2093055578404243854, guid: 1c5bb660fbdbd4f429858f208e282abc, type: 3}
+  floorTile1: {fileID: 919132149155446097, guid: 16ddad8c152f947b988598d893d14b75, type: 3}
+  floorTile2: {fileID: 919132149155446097, guid: 520f45616af8c4550aca3b08572972b1, type: 3}
+  floorTile3: {fileID: 919132149155446097, guid: 395e63dbf556f4ebfa3e7618467a9893, type: 3}
+  wallNormal: {fileID: 919132149155446097, guid: 46f5618e03e4c438e95f04ee732f7b15, type: 3}
+  wallCorner: {fileID: 919132149155446097, guid: bb8be00daa0b946f7baec52e89e1e21d, type: 3}
+  wallDoorway: {fileID: 919132149155446097, guid: 5e3d244c5af3d46e8bd624fbcac83d90, type: 3}
+  barrel: {fileID: 919132149155446097, guid: 48049821883fe47fa8740943bc2d014e, type: 3}
+  crate: {fileID: 919132149155446097, guid: 2a058318a3a724b6ebe67a9f6dcee84e, type: 3}
+  pillar: {fileID: 919132149155446097, guid: 30a1cdce646924f8988b21b1ad0b3157, type: 3}
+  torch: {fileID: 919132149155446097, guid: ca293b38340bb435b9175bcc07ef8980, type: 3}
+  banner: {fileID: 919132149155446097, guid: 30e237a8599fb4c539e7e9fa6348c60f, type: 3}
   northDoor: 1
   southDoor: 0
   eastDoor: 0
   westDoor: 0
-  roomWidth: 20
-  roomDepth: 20
+  roomWidth: 30
+  roomDepth: 30
+  tileSize: 4
+  propDensity: 0.1
 --- !u!4 &1664958384
 Transform:
   m_ObjectHideFlags: 0
