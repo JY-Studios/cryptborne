@@ -15,8 +15,11 @@ namespace Characters.Player
         private bool isDashing;
         private bool canDash = true;
         private CharacterController controller;
-        // WeaponData und weapon entfernt - jetzt in WeaponInventory
-    
+        private Animator animator;
+        private string currentAnimation = "";
+        private Vector3 lastMoveDirection;
+        private bool isMoving; // NEU: Tracking ob wir uns bewegen
+
         void Start()
         {
             controller = GetComponent<CharacterController>();
@@ -24,12 +27,33 @@ namespace Characters.Player
             {
                 controller = gameObject.AddComponent<CharacterController>();
             }
-            // Weapon-Initialisierung entfernt
+
+            animator = GetComponentInChildren<Animator>();
+            if (animator == null)
+            {
+                Debug.LogError("Kein Animator gefunden! Auch nicht in Children.");
+            }
         }
-    
+
         void Update()
         {
-            // Input
+            HandleInput();
+            HandleMovement();
+            UpdateAnimation();
+        }
+        
+        // NEU: Rotation in LateUpdate - wird NACH allen anderen Updates ausgeführt!
+        void LateUpdate()
+        {
+            // Wenn wir uns bewegen, ERZWINGE Laufrichtung
+            if (isMoving && lastMoveDirection.magnitude > 0.1f)
+            {
+                transform.rotation = Quaternion.LookRotation(lastMoveDirection);
+            }
+        }
+        
+        void HandleInput()
+        {
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
@@ -39,21 +63,54 @@ namespace Characters.Player
                 if (keyboard.aKey.isPressed) input.x -= 1;
                 if (keyboard.dKey.isPressed) input.x += 1;
                 moveInput = input.normalized;
-            
+                
                 if (keyboard.spaceKey.wasPressedThisFrame && canDash && !isDashing)
                 {
                     StartCoroutine(Dash());
                 }
             }
+        }
         
-            // Bewegung
+        void HandleMovement()
+        {
             if (!isDashing)
             {
                 Vector3 move = new Vector3(moveInput.x, 0, moveInput.y) * (moveSpeed * Time.deltaTime);
                 controller.Move(move);
+                
+                // Bewegungsrichtung speichern
+                if (move.magnitude > 0.1f)
+                {
+                    lastMoveDirection = move.normalized;
+                    isMoving = true;
+                }
+                else
+                {
+                    isMoving = false;
+                }
             }
-            
-            // Weapon-Logik entfernt - jetzt in WeaponInventory
+        }
+        
+        void UpdateAnimation()
+        {
+            if (animator == null) return;
+
+            string targetAnimation;
+
+            if (moveInput.magnitude > 0.1f)
+            {
+                targetAnimation = "Running_B";
+            }
+            else
+            {
+                targetAnimation = "Idle";
+            }
+
+            if (currentAnimation != targetAnimation)
+            {
+                animator.CrossFade(targetAnimation, 0.1f);
+                currentAnimation = targetAnimation;
+            }
         }
     
         System.Collections.IEnumerator Dash()
