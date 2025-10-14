@@ -79,19 +79,19 @@ public class ModularRoomBuilder : MonoBehaviour
         }
         
         // ===== WÄNDE =====
-        // Offset für Süd/West-Wände damit sie außerhalb des Floor-Bereichs spawnen
+        // Offset für die Ecken
         float wallOffset = -2f;
         
-        // NORD-WAND (oben) - bei z = roomDepth
+        // NORD-WAND (oben) - von x=0 bis x=24, bei z=24
         BuildWallLine(0, roomDepth, roomWidth, true, northDoor, 0);
         
-        // SÜD-WAND (unten) - bei z = 0, mit Offset nach außen
+        // SÜD-WAND (unten) - von x=0 bis x=24, bei z=wallOffset
         BuildWallLine(0, wallOffset, roomWidth, true, southDoor, 180);
         
-        // OST-WAND (rechts) - bei x = roomWidth
+        // OST-WAND (rechts) - von z=0 bis z=24, bei x=24
         BuildWallLine(roomWidth, 0, roomDepth, false, eastDoor, 90);
         
-        // WEST-WAND (links) - bei x = 0, mit Offset nach außen
+        // WEST-WAND (links) - von z=0 bis z=24, bei x=wallOffset
         BuildWallLine(wallOffset, 0, roomDepth, false, westDoor, 270);
         
         // ===== ECKEN =====
@@ -128,18 +128,19 @@ public class ModularRoomBuilder : MonoBehaviour
             EnsureCollider(corner4);
         }
     }
-    
+
     void BuildWallLine(float xPos, float zPos, int length, bool isHorizontal, bool hasDoor, float rotation)
     {
-        int wallCount = length / 4;
-        
+        // +1 um bis zur Ecke zu reichen!
+        int wallCount = (length / 4) + 1;
+
         for (int i = 0; i < wallCount; i++)
         {
-            Vector3 pos = isHorizontal ? new Vector3(i * 4, 0, zPos) : new Vector3(xPos, 0, i * 4);
-            
+            Vector3 pos = isHorizontal ? new Vector3(xPos + i * 4, 0, zPos) : new Vector3(xPos, 0, zPos + i * 4);
+
             // Tür in der Mitte
             bool isDoorPosition = hasDoor && i == wallCount / 2;
-            
+
             if (isDoorPosition)
             {
                 if (wallDoorway != null)
@@ -156,7 +157,7 @@ public class ModularRoomBuilder : MonoBehaviour
                     GameObject wall = Instantiate(wallNormal, pos, Quaternion.Euler(0, rotation, 0), transform);
                     SetTagRecursive(wall, "Wall");
                     EnsureCollider(wall);
-                    
+
                     // Gelegentlich Wand-Dekoration
                     if (Random.value < wallDecoDensity && (torch != null || (spawnBanners && banner != null)))
                     {
