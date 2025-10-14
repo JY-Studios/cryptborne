@@ -1,5 +1,6 @@
 using System.Linq;
 using Characters.Enemies;
+using Characters.Player;
 using UnityEngine;
 using Weapons.Data;
 using Weapons.Projectiles;
@@ -43,7 +44,13 @@ namespace Weapons.Behaviours.Ranged
             
             Vector3 dir = (nearestEnemy.transform.position - player.position).normalized;
             dir.y = 0f;
-            player.rotation = Quaternion.LookRotation(dir);
+            
+            // NEU: Nur zur Schussrichtung drehen wenn NICHT läuft!
+            var playerController = player.GetComponent<PlayerController>();
+            if (playerController != null && !playerController.IsMoving)
+            {
+                player.rotation = Quaternion.LookRotation(dir);
+            }
 
             foreach (var projectile in data.projectiles)
             {

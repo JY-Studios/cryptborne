@@ -10,6 +10,9 @@ namespace Characters.Player
         public float dashSpeed = 15f;
         public float dashDuration = 0.2f;
         public float dashCooldown = 1f;
+        
+        [Header("Rotation Settings")]
+        public float rotationSpeed = 720f; // Grad pro Sekunde
     
         private Vector2 moveInput;
         private bool isDashing;
@@ -17,8 +20,8 @@ namespace Characters.Player
         private CharacterController controller;
         private Animator animator;
         private string currentAnimation = "";
-        private Vector3 lastMoveDirection;
-        private bool isMoving; // NEU: Tracking ob wir uns bewegen
+        private Vector3 movementDirection; // Aktuelle Bewegungsrichtung
+        private bool isMoving;
 
         void Start()
         {
@@ -42,13 +45,18 @@ namespace Characters.Player
             UpdateAnimation();
         }
         
-        // NEU: Rotation in LateUpdate - wird NACH allen anderen Updates ausgeführt!
         void LateUpdate()
         {
-            // Wenn wir uns bewegen, ERZWINGE Laufrichtung
-            if (isMoving && lastMoveDirection.magnitude > 0.1f)
+            // IMMER wenn wir Bewegungsinput haben, zur Bewegungsrichtung drehen
+            if (isMoving && movementDirection.magnitude > 0.01f)
             {
-                transform.rotation = Quaternion.LookRotation(lastMoveDirection);
+                // Sanfte Rotation zur Bewegungsrichtung (optional: sofort mit Quaternion.LookRotation)
+                Quaternion targetRotation = Quaternion.LookRotation(movementDirection);
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation, 
+                    targetRotation, 
+                    rotationSpeed * Time.deltaTime
+                );
             }
         }
         
@@ -75,14 +83,16 @@ namespace Characters.Player
         {
             if (!isDashing)
             {
-                Vector3 move = new Vector3(moveInput.x, 0, moveInput.y) * (moveSpeed * Time.deltaTime);
-                controller.Move(move);
+                Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
                 
-                // Bewegungsrichtung speichern
                 if (move.magnitude > 0.1f)
                 {
-                    lastMoveDirection = move.normalized;
+                    // Bewegungsrichtung speichern
+                    movementDirection = move.normalized;
                     isMoving = true;
+                    
+                    // Bewegen
+                    controller.Move(move * moveSpeed * Time.deltaTime);
                 }
                 else
                 {
@@ -131,5 +141,8 @@ namespace Characters.Player
             yield return new WaitForSeconds(dashCooldown);
             canDash = true;
         }
+        
+        // NEU: Public Property damit andere Scripts wissen ob wir uns bewegen
+        public bool IsMoving => isMoving;
     }
 }
