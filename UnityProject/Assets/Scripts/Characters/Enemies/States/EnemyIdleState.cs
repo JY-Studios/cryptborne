@@ -6,19 +6,35 @@ namespace Characters.Enemies.States
     {
         public override void Enter(EnemyStateManager enemy)
         {
-            // z.B. Idle-Animation starten
+            // Animation: Idle - DIREKT!
+            if (enemy.animator != null)
+            {
+                enemy.animator.CrossFade("Idle", 0.1f);
+                Debug.Log("Enemy: Playing Idle animation");
+            }
+            else
+            {
+                Debug.LogWarning("Enemy: No animator found for Idle!");
+            }
         }
 
         public override void Update(EnemyStateManager enemy)
         {
-            if (enemy.player == null) return;
+            if (enemy.player == null || !enemy.health.IsAlive())
+                return;
 
-            float distance = Vector3.Distance(enemy.transform.position, enemy.player.position);
+            // Spieler in Range? Chase starten
+            float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.player.position);
 
-            if (distance <= enemy.detectionRange)
+            if (distanceToPlayer <= enemy.detectionRange)
+            {
                 enemy.SwitchState(enemy.chaseState);
+            }
         }
 
-        public override void Exit(EnemyStateManager enemy) { }
+        public override void Exit(EnemyStateManager enemy)
+        {
+            // Nichts zu tun
+        }
     }
 }

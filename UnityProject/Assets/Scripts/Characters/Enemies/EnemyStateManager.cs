@@ -15,6 +15,7 @@ namespace Characters.Enemies
         [HideInInspector] public Transform player;
         [HideInInspector] public CharacterController controller;
         [HideInInspector] public EnemyHealth health;
+        [HideInInspector] public Animator animator; // NEU: Animator-Referenz
         
         [Header("Movement")]
         public float moveSpeed = 2f;
@@ -34,7 +35,6 @@ namespace Characters.Enemies
         
         void OnEnable()
         {
-            // Beim Pool-Recycling neu initialisieren
             Initialize();
         }
         
@@ -53,6 +53,18 @@ namespace Characters.Enemies
             if (health == null)
                 health = GetComponent<EnemyHealth>();
 
+            if (animator == null)
+                animator = GetComponentInChildren<Animator>(); // ← GENAU WIE BEIM PLAYER!
+
+            if (animator != null)
+            {
+                Debug.Log($"Enemy Animator found on: {animator.gameObject.name}");
+            }
+            else
+            {
+                Debug.LogError("No Animator found in children!");
+            }
+
             // Startzustand setzen
             currentState = null;
             SwitchState(idleState);
@@ -60,10 +72,8 @@ namespace Characters.Enemies
         
         public void ResetEnemy()
         {
-            // Combat Timer zurücksetzen
             nextAttackTime = 0f;
             
-            // State komplett zurücksetzen
             if (currentState != null)
                 currentState.Exit(this);
             
@@ -72,19 +82,21 @@ namespace Characters.Enemies
             if (controller != null)
             {
                 controller.enabled = false;
-                // KEINE Position-Änderung hier!
-                // transform.position wird vom PoolManager gesetzt
             }
             
-            // Player-Referenz neu holen
+            // Animator zurücksetzen
+            if (animator != null)
+            {
+                animator.Rebind();
+                animator.Update(0f);
+            }
+            
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
             if (playerObj != null)
                 player = playerObj.transform;
             
-            // Zurück zum Idle State
             SwitchState(idleState);
             
-            // CharacterController wieder enablen NACH State-Wechsel
             if (controller != null)
             {
                 controller.enabled = true;

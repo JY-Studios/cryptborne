@@ -1120,6 +1120,7 @@ MonoBehaviour:
   dashSpeed: 15
   dashDuration: 0.2
   dashCooldown: 1
+  rotationSpeed: 720
 --- !u!143 &1238952121
 CharacterController:
   m_ObjectHideFlags: 0
@@ -1980,8 +1981,8 @@ MonoBehaviour:
     prefab: {fileID: 4233209234532055656, guid: f8c516981e7824d75b684d2712b50894, type: 3}
     poolSize: 30
   - poolName: Enemy
-    prefab: {fileID: 1623100427540999979, guid: 95df14c81eae84716b6e51fcf3a5c777, type: 3}
-    poolSize: 20
+    prefab: {fileID: 4242362835436368134, guid: d9a55559d105946919ed31a14f430db2, type: 3}
+    poolSize: 30
   - poolName: Particle
     prefab: {fileID: 0}
     poolSize: 15
