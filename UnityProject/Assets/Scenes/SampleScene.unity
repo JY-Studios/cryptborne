@@ -1726,8 +1726,8 @@ MonoBehaviour:
   pillar: {fileID: 919132149155446097, guid: 30a1cdce646924f8988b21b1ad0b3157, type: 3}
   torch: {fileID: 919132149155446097, guid: ca293b38340bb435b9175bcc07ef8980, type: 3}
   banner: {fileID: 919132149155446097, guid: 30e237a8599fb4c539e7e9fa6348c60f, type: 3}
-  spawnBanners: 1
-  northDoor: 1
+  spawnBanners: 0
+  northDoor: 0
   southDoor: 0
   eastDoor: 0
   westDoor: 0
