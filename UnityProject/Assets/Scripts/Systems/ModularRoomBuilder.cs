@@ -167,19 +167,20 @@ public class ModularRoomBuilder : MonoBehaviour
             }
         }
     }
-    
+
     void SpawnRandomProp(Vector3 position)
     {
         List<GameObject> props = new List<GameObject>();
         if (barrel != null) props.Add(barrel);
         if (crate != null) props.Add(crate);
         if (pillar != null) props.Add(pillar);
-        
+
         if (props.Count > 0)
         {
             GameObject prop = props[Random.Range(0, props.Count)];
             float randomRotation = Random.Range(0, 4) * 90f;
             GameObject spawnedProp = Instantiate(prop, position, Quaternion.Euler(0, randomRotation, 0), transform);
+            SetTagRecursive(spawnedProp, "Wall");
             EnsureCollider(spawnedProp);
         }
     }
@@ -239,26 +240,30 @@ public class ModularRoomBuilder : MonoBehaviour
             SetTagRecursive(child.gameObject, newTag);
         }
     }
-    
+
     void EnsureCollider(GameObject obj, bool isTrigger = false)
     {
-        // Prüfe ob bereits ein Collider existiert
-        if (obj.GetComponent<Collider>() == null && obj.GetComponentInChildren<Collider>() == null)
+        // Finde ALLE MeshFilters (auch in Children)
+        MeshFilter[] meshFilters = obj.GetComponentsInChildren<MeshFilter>();
+
+        if (meshFilters.Length > 0)
         {
-            // Versuche Mesh zu finden für MeshCollider
-            MeshFilter meshFilter = obj.GetComponentInChildren<MeshFilter>();
-            if (meshFilter != null)
+            // Füge MeshCollider zu jedem Child mit Mesh hinzu
+            foreach (var meshFilter in meshFilters)
             {
-                MeshCollider collider = obj.AddComponent<MeshCollider>();
-                collider.convex = false;
-                collider.isTrigger = isTrigger;
+                if (meshFilter.GetComponent<Collider>() == null)
+                {
+                    MeshCollider collider = meshFilter.gameObject.AddComponent<MeshCollider>();
+                    collider.convex = false;
+                    collider.isTrigger = isTrigger;
+                }
             }
-            else
-            {
-                // Fallback: BoxCollider
-                BoxCollider boxCollider = obj.AddComponent<BoxCollider>();
-                boxCollider.isTrigger = isTrigger;
-            }
+        }
+        else if (obj.GetComponent<Collider>() == null)
+        {
+            // Fallback: BoxCollider am Parent
+            BoxCollider boxCollider = obj.AddComponent<BoxCollider>();
+            boxCollider.isTrigger = isTrigger;
         }
     }
 }
