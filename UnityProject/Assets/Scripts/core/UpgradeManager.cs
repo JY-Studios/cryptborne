@@ -13,7 +13,7 @@ namespace Core.Events
         public static UpgradeManager Instance;
 
         [Header("UI")]
-        public GameObject upgradePanel;      // Panel mit Upgrade-Buttons
+        public GameObject upgradePanel;
         public Button damageButton;
         public Button attackSpeedButton;
         public Button healButton;
@@ -54,16 +54,16 @@ namespace Core.Events
 
         public void UpgradeAttackSpeed()
         {
-            if(playerWeapon != null)
+            if (playerWeapon != null)
                 playerWeapon.attackSpeed *= 0.9f; // 10% schneller
             ClosePanel();
         }
 
         public void HealPlayer()
         {
-            // Spieler direkt heilen, z. B. Health-Komponente
+            // Spieler direkt heilen
             PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
-            if(playerHealth != null)
+            if (playerHealth != null)
                 playerHealth.Heal(20);
             ClosePanel();
         }
@@ -72,7 +72,12 @@ namespace Core.Events
         {
             upgradePanel.SetActive(false);
             Time.timeScale = 1f; // Spiel fortsetzen
-            EnemySpawner.Instance.StartNextWave(); // Wave startet erst nach Upgrade
+            
+            // Nächste Wave mit Delay starten
+            if (EnemySpawner.Instance != null)
+            {
+                EnemySpawner.Instance.StartNextWaveAfterDelay();
+            }
         }
     }
 }

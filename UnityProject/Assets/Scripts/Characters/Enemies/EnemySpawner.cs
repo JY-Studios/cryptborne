@@ -11,24 +11,26 @@ namespace Characters.Enemies
     {
         public static EnemySpawner Instance;
 
-        [Header("Wave Settings")] public int startingEnemies = 5; // Enemies in Wave 1
+        [Header("Wave Settings")] 
+        public int startingEnemies = 5; // Enemies in Wave 1
         public int enemiesIncreasePerWave = 1; // Wie viele mehr pro Wave
         public float timeBetweenWaves = 5f; // Pause zwischen Waves
         public float spawnDelay = 0.3f; // Delay zwischen einzelnen Spawns
 
-        [Header("Current Wave Info")] [SerializeField]
-        private int currentWave = 0;
-
+        [Header("Current Wave Info")] 
+        [SerializeField] private int currentWave = 0;
         [SerializeField] private int enemiesInCurrentWave = 0;
         [SerializeField] private int enemiesAlive = 0;
         [SerializeField] private bool waveInProgress = false;
-        [SerializeField] private bool isSpawning = false; // NEU: Track ob noch gespawnt wird
+        [SerializeField] private bool isSpawning = false;
 
-        [Header("UI References")] public TextMeshProUGUI waveText;
+        [Header("UI References")] 
+        public TextMeshProUGUI waveText;
         public TextMeshProUGUI enemiesRemainingText;
         public GameObject waveCompletePanel;
 
-        [Header("Auto-Detect Room")] public ModularRoomBuilder roomBuilder;
+        [Header("Auto-Detect Room")] 
+        public ModularRoomBuilder roomBuilder;
         public float wallOffset = 1.5f;
 
         private List<GameObject> activeEnemies = new List<GameObject>();
@@ -64,7 +66,7 @@ namespace Characters.Enemies
             if (waveInProgress && activeEnemies.Contains(enemy))
             {
                 activeEnemies.Remove(enemy);
-                enemiesAlive--; // Dekrementieren statt neu zählen!
+                enemiesAlive--;
 
                 // Event für UI Updates
                 GameEvents.EnemiesRemainingChanged(enemiesAlive, enemiesInCurrentWave);
@@ -72,7 +74,7 @@ namespace Characters.Enemies
                 UpdateUI();
 
                 // Wave nur beenden wenn ALLE gespawnt wurden UND alle tot sind
-                if (enemiesAlive == 0 && !isSpawning) // NEU: Check ob noch gespawnt wird
+                if (enemiesAlive == 0 && !isSpawning)
                 {
                     CompleteWave();
                 }
@@ -91,12 +93,20 @@ namespace Characters.Enemies
             if (waveCompletePanel != null)
             {
                 waveCompletePanel.SetActive(true);
-                UpgradeManager.Instance.ShowUpgradePanel();
                 StartCoroutine(HideWaveCompletePanel());
             }
 
-            // Nächste Wave starten
-            StartCoroutine(StartNextWaveWithDelay(timeBetweenWaves));
+            // WICHTIG: Upgrade Panel übernimmt die Kontrolle!
+            if (UpgradeManager.Instance != null)
+            {
+                UpgradeManager.Instance.ShowUpgradePanel();
+                // UpgradeManager ruft dann StartNextWaveAfterDelay() auf
+            }
+            else
+            {
+                // Fallback falls kein UpgradeManager existiert
+                StartCoroutine(StartNextWaveWithDelay(timeBetweenWaves));
+            }
         }
 
         IEnumerator HideWaveCompletePanel()
@@ -112,13 +122,19 @@ namespace Characters.Enemies
             StartNextWave();
         }
 
+        // Öffentliche Methode für UpgradeManager um Wave mit Delay zu starten
+        public void StartNextWaveAfterDelay()
+        {
+            StartCoroutine(StartNextWaveWithDelay(timeBetweenWaves));
+        }
+
         public void StartNextWave()
         {
             currentWave++;
             enemiesInCurrentWave = startingEnemies + (enemiesIncreasePerWave * (currentWave - 1));
-            enemiesAlive = enemiesInCurrentWave; // NEU: Sofort auf erwartete Anzahl setzen!
+            enemiesAlive = enemiesInCurrentWave;
             waveInProgress = true;
-            isSpawning = true; // NEU: Spawn-Status setzen
+            isSpawning = true;
 
             Debug.Log($"Starting Wave {currentWave} with {enemiesInCurrentWave} enemies");
 
@@ -134,7 +150,7 @@ namespace Characters.Enemies
         IEnumerator SpawnWaveEnemies()
         {
             activeEnemies.Clear();
-            int spawnedCount = 0; // NEU: Track wie viele gespawnt wurden
+            int spawnedCount = 0;
 
             float roomWidth = roomBuilder ? roomBuilder.roomWidth : 10;
             float roomDepth = roomBuilder ? roomBuilder.roomDepth : 10;
@@ -171,7 +187,7 @@ namespace Characters.Enemies
                 yield return new WaitForSeconds(spawnDelay);
             }
 
-            isSpawning = false; // NEU: Spawn abgeschlossen
+            isSpawning = false;
 
             // Falls alle Enemies während des Spawnens getötet wurden
             if (enemiesAlive == 0)
@@ -224,7 +240,7 @@ namespace Characters.Enemies
                 }
 
                 // RAYCAST von oben nach unten um Bodenhöhe zu finden
-                Vector3 rayStart = randomPos + Vector3.up * 10f; // 10 Units über der Position
+                Vector3 rayStart = randomPos + Vector3.up * 10f;
                 RaycastHit hit;
 
                 if (Physics.Raycast(rayStart, Vector3.down, out hit, 15f, LayerMask.GetMask("Default")))
@@ -254,9 +270,6 @@ namespace Characters.Enemies
             // Scale Animation für Spawn
             enemy.transform.localScale = Vector3.zero;
             StartCoroutine(ScaleIn(enemy.transform));
-
-            // Particle Effect spawnen (wenn vorhanden)
-            // GameObject spawnVFX = PoolManager.Instance.Spawn("SpawnVFX", enemy.transform.position, Quaternion.identity);
         }
 
         IEnumerator ScaleIn(Transform enemyTransform)
@@ -308,7 +321,7 @@ namespace Characters.Enemies
 
             activeEnemies.Clear();
             enemiesAlive = 0;
-            isSpawning = false; // NEU: Reset spawn status
+            isSpawning = false;
             GameEvents.EnemiesRemainingChanged(0, enemiesInCurrentWave);
         }
 
