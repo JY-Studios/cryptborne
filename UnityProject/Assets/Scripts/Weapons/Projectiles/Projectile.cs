@@ -165,33 +165,46 @@ namespace Weapons.Projectiles
 
         private void OnTriggerEnter(Collider other)
         {
-            if (!other.CompareTag("Enemy")) return;
-            
-            Debug.Log($"Projectile hit enemy: {other.gameObject.name}");
-            
-            // Impact Position berechnen
+            // Impact Position und Normal einmal hier deklarieren
             Vector3 impactPosition = transform.position;
             Vector3 impactNormal = (transform.position - other.transform.position).normalized;
-            
+
+            // Wände und Props stoppen das Projektil
+            if (other.CompareTag("Wall"))
+            {
+                if (_isOrbiting) return; // Orbit-Projektile ignorieren Wände
+
+                // NUR Sound, KEIN Blut-VFX für Wände
+                SoundManager.Instance.PlayImpactSound();
+
+                Despawn();
+                return;
+            }
+
+            if (!other.CompareTag("Enemy")) return;
+
+            Debug.Log($"Projectile hit enemy: {other.gameObject.name}");
+
             // Damage aus Effect extrahieren
             int damageDealt = GetDamageFromEffect();
-            
+
             // Normale Projektile: Einmal treffen und despawnen
             if (!_isOrbiting)
             {
                 if (_hasHit) return;
-                
+
                 _hasHit = true;
                 _effect?.OnHit(other.gameObject, this);
-                
+
                 // Impact VFX, Sound und Damage Number spawnen
                 VFXManager.SpawnImpactEffect(impactPosition, impactNormal);
                 SoundManager.Instance.PlayImpactSound();
                 DamageNumberManager.Instance.ShowDamage(impactPosition, damageDealt);
-                
+
                 Despawn();
                 return;
             }
+
             
             // Orbit-Projektile: Hit-Cooldown System
             GameObject enemy = other.gameObject;
