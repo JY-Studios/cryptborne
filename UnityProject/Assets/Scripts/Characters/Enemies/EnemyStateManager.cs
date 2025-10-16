@@ -70,6 +70,14 @@ namespace Characters.Enemies
             SwitchState(idleState);
         }
         
+        public void ScaleStats(int wave)
+        {
+            float multiplier = 1f + wave * 0.1f; // 10% stärker pro Wave
+            attackDamage = Mathf.CeilToInt(attackDamage * multiplier);
+            health.maxHealth = Mathf.CeilToInt(health.maxHealth * multiplier);
+            health.currentHealth = health.maxHealth; // Reset Health
+        }
+        
         public void ResetEnemy()
         {
             nextAttackTime = 0f;

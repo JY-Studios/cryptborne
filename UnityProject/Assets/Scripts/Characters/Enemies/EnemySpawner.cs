@@ -93,6 +93,7 @@ namespace Characters.Enemies
             if (waveCompletePanel != null)
             {
                 waveCompletePanel.SetActive(true);
+                UpgradeManager.Instance.ShowUpgradePanel();
                 StartCoroutine(HideWaveCompletePanel());
             }
             
@@ -146,9 +147,12 @@ namespace Characters.Enemies
                 
                 // Spawn mit coolem Effekt
                 GameObject enemy = PoolManager.Instance.Spawn("Enemy", randomPos, Quaternion.identity);
+                EnemyStateManager esm = enemy.GetComponent<EnemyStateManager>();
                 
                 if (enemy != null)
                 {
+                    if (esm != null)
+                        esm.ScaleStats(currentWave);
                     activeEnemies.Add(enemy);
                     spawnedCount++;
                     

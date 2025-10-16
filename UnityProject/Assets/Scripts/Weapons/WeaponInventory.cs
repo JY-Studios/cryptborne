@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Weapons;
@@ -196,6 +197,7 @@ namespace Characters.Player
                 behavior.Attack(currentWeaponData, transform);
             }
 
+            UpgradeManager.Instance.SetPlayerWeapon(currentWeaponData);
             OnWeaponSwitched?.Invoke(currentWeaponData, currentWeaponIndex);
         }
 
