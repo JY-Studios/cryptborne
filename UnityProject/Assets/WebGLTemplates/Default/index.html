@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>{{{ PRODUCT_NAME }}} | Unity WebGL</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="site-header">
+    <h1>{{{ PRODUCT_NAME }}}</h1>
+    <p>Überlebe so viele Wellen wie möglich! Kurze Projektbeschreibung hier.</p>
+</header>
+
+<!-- UNITY CANVAS -->
+<div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas" width="{{{ WIDTH }}}" height="{{{ HEIGHT }}}" tabindex="-1"></canvas>
+    <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+            <div id="unity-progress-bar-full"></div>
+        </div>
+    </div>
+    <div id="unity-warning"></div>
+    <div id="unity-footer">
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">{{{ PRODUCT_NAME }}}</div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer id="site-footer">
+    <p>© 2025 MeinName - Unity WebGL Demo</p>
+</footer>
+
+<!-- UNITY LOADER SCRIPT -->
+<script>
+    var canvas = document.querySelector("#unity-canvas");
+
+    function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type === 'error') div.style = 'background: red; padding: 10px;';
+        else if (type === 'warning') div.style = 'background: yellow; padding: 10px;';
+        setTimeout(() => { warningBanner.removeChild(div); }, 5000);
+    }
+
+    var buildUrl = "Build";
+    var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+    var config = {
+        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "{{{ COMPANY_NAME }}}",
+        productName: "{{{ PRODUCT_NAME }}}",
+        productVersion: "{{{ PRODUCT_VERSION }}}",
+        showBanner: unityShowBanner
+    };
+
+    document.querySelector("#unity-loading-bar").style.display = "block";
+
+    var script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+            document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+            document.querySelector("#unity-loading-bar").style.display = "none";
+            document.querySelector("#unity-fullscreen-button").onclick = () => {
+                unityInstance.SetFullscreen(1);
+            };
+        }).catch(console.error);
+    };
+    document.body.appendChild(script);
+</script>
+
+</body>
+</html>
