@@ -1,0 +1,342 @@
+/* Modern Unity WebGL Player Styles */
+
+:root {
+  --primary-color: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary-color: #8b5cf6;
+  --background-dark: #0f172a;
+  --background-light: #1e293b;
+  --surface: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --accent-glow: rgba(99, 102, 241, 0.3);
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, var(--background-dark) 0%, #1a1f3a 100%);
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Animated background effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  animation: pulse 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+#unity-container {
+  position: relative;
+  z-index: 1;
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+#unity-container:hover {
+  box-shadow: 
+    0 25px 70px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+#unity-container.unity-desktop {
+  width: auto;
+  height: auto;
+}
+
+#unity-container.unity-mobile {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border-radius: 0;
+}
+
+#unity-canvas {
+  display: block;
+  background: #000;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+canvas.unity-mobile {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+}
+
+/* Loading Bar Styles */
+#unity-loading-bar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  display: none;
+}
+
+#unity-logo {
+  width: 200px;
+  height: 200px;
+  background: url('unity-logo-dark.png') no-repeat center;
+  background-size: contain;
+  margin: 0 auto 30px;
+  filter: drop-shadow(0 0 20px var(--accent-glow));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+#unity-progress-bar-empty {
+  width: 100%;
+  height: 8px;
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 20px var(--accent-glow);
+}
+
+#unity-progress-bar-full {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    var(--primary-color) 0%, 
+    var(--secondary-color) 50%, 
+    var(--primary-color) 100%);
+  background-size: 200% 100%;
+  border-radius: 20px;
+  transition: width 0.3s ease;
+  animation: shimmer 2s linear infinite;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Warning/Error Messages */
+#unity-warning {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  background: rgba(239, 68, 68, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(239, 68, 68, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: none;
+  z-index: 10;
+  max-width: 80%;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+#unity-warning div {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer Styles */
+#unity-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 16px;
+}
+
+#unity-logo-title-footer {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  background: url('unity-logo-white.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+#unity-logo-title-footer:hover {
+  opacity: 1;
+}
+
+#unity-build-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+#unity-fullscreen-button {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 8px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+#unity-fullscreen-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+#unity-fullscreen-button:active {
+  transform: translateY(0);
+}
+
+#unity-fullscreen-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* Diagnostics Icon */
+#diagnostics-icon {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  filter: brightness(1.2);
+}
+
+#diagnostics-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Mobile Responsive */
+.unity-mobile #unity-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0;
+  border-radius: 0;
+  padding: 12px;
+}
+
+.unity-mobile #unity-logo-title-footer,
+.unity-mobile #unity-fullscreen-button {
+  width: 32px;
+  height: 32px;
+}
+
+.unity-mobile #unity-build-title {
+  font-size: 14px;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+  
+  #unity-container {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}

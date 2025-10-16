@@ -1,385 +1,133 @@
 <!DOCTYPE html>
-<html lang="de">
-<head>
+<html lang="en-us">
+  <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dungeon Crawler - WebGL Build</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #e8e8e8;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1400px;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        h1 {
-            font-size: 3em;
-            color: #ffd700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8),
-            0 0 20px rgba(255, 215, 0, 0.3);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-            font-size: 1.2em;
-            color: #b8b8b8;
-            font-style: italic;
-        }
-
-        #unity-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            margin: 0 auto;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
-        }
-
-        #unity-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            background: #000;
-        }
-
-        #unity-loading-bar {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .loading-text {
-            color: #ffd700;
-            font-size: 1.5em;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.6;
-            }
-        }
-
-        #unity-progress-bar-empty {
-            width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid rgba(255, 215, 0, 0.3);
-        }
-
-        #unity-progress-bar-full {
-            height: 100%;
-            background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
-            border-radius: 8px;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-        }
-
-        #unity-warning {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            z-index: 10;
-        }
-
-        .warning-message {
-            background: rgba(255, 193, 7, 0.95);
-            color: #000;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .error-message {
-            background: rgba(220, 53, 69, 0.95);
-            color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 12px 30px;
-            font-size: 1em;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #1a1a2e;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #e8e8e8;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .info-panel {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .info-panel h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
-        .controls-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .control-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-        }
-
-        .key {
-            background: rgba(255, 215, 0, 0.2);
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            color: #ffd700;
-            min-width: 80px;
-            text-align: center;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 2em;
-            }
-
-            .controls-list {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #888;
-            font-size: 0.9em;
-        }
-    </style>
-</head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>⚔️ Dungeon Crawler ⚔️</h1>
-        <div class="subtitle">WebGL Build - Bereit für das Abenteuer!</div>
-    </div>
-
-    <div id="unity-container">
-        <canvas id="unity-canvas" tabindex="-1"></canvas>
-        <div id="unity-loading-bar">
-            <div class="loading-text">Lädt Dungeon Assets...</div>
-            <div id="unity-progress-bar-empty">
-                <div id="unity-progress-bar-full"></div>
-            </div>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity Web Player | UnityProject</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/styles.css">
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
         </div>
-        <div id="unity-warning"></div>
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-logo-title-footer"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">UnityProject</div>
+      </div>
     </div>
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
 
-    <div class="controls">
-        <button id="fullscreen-btn" class="btn btn-primary">
-            🖥️ Vollbild
-        </button>
-        <button id="reload-btn" class="btn btn-secondary">
-            🔄 Neu laden
-        </button>
-    </div>
-
-    <div class="info-panel">
-        <h3>🎮 Steuerung</h3>
-        <div class="controls-list">
-            <div class="control-item">
-                <span class="key">WASD</span>
-                <span>Bewegung</span>
-            </div>
-            <div class="control-item">
-                <span class="key">1-9</span>
-                <span>Waffen wechseln</span>
-            </div>
-            <div class="control-item">
-                <span class="key">Q / E</span>
-                <span>Waffen durchschalten</span>
-            </div>
-            <div class="control-item">
-                <span class="key">Mausrad</span>
-                <span>Waffen scrollen</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
-        Erstellt mit Unity 6 | KayKit Assets
-    </div>
-</div>
-
-<script>
-    var canvas = document.querySelector("#unity-canvas");
-    var unityInstanceRef = null;
-
-    function unityShowBanner(msg, type) {
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
         var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
         var div = document.createElement('div');
         div.innerHTML = msg;
-        div.className = type === 'error' ? 'error-message' : 'warning-message';
         warningBanner.appendChild(div);
-
-        if (type !== 'error') {
-            setTimeout(() => {
-                warningBanner.removeChild(div);
-            }, 5000);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
         }
-    }
+        updateBannerVisibility();
+      }
 
-    var buildUrl = "Build";
-    var loaderUrl = buildUrl + "/docs.loader.js";
-    var config = {
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/docs.loader.js";
+      var config = {
         arguments: [],
         dataUrl: buildUrl + "/docs.data",
         frameworkUrl: buildUrl + "/docs.framework.js",
         codeUrl: buildUrl + "/docs.wasm",
         streamingAssetsUrl: "StreamingAssets",
-        companyName: {
-    {
-        {
-            JSON.stringify(COMPANY_NAME)
-        }
-    }
-    },
-    productName: {
-        {
-            {
-                JSON.stringify(PRODUCT_NAME)
-            }
-        }
-    }
-    ,
-    productVersion: {
-        {
-            {
-                JSON.stringify(PRODUCT_VERSION)
-            }
-        }
-    }
-    ,
-    showBanner: unityShowBanner,
-    }
-    ;
+        companyName: "DefaultCompany",
+        productName: "UnityProject",
+        productVersion: "0.1.0",
+        showBanner: unityShowBanner,
+        // errorHandler: function(err, url, line) {
+        //    alert("error " + err + " occurred at line " + line);
+        //    // Return 'true' if you handled this error and don't want Unity
+        //    // to process it further, 'false' otherwise.
+        //    return true;
+        // },
+      };
 
-    document.querySelector("#unity-loading-bar").style.display = "block";
+      // By default, Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
 
-    var script = document.createElement("script");
-    script.src = loaderUrl;
-    script.onload = () => {
+      // If you would like all file writes inside Unity Application.persistentDataPath
+      // directory to automatically persist so that the contents are remembered when
+      // the user revisits the site the next time, uncomment the following line:
+      // config.autoSyncPersistentDataPath = true;
+      // This autosyncing is currently not the default behavior to avoid regressing
+      // existing user projects that might rely on the earlier manual
+      // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
+      // expected to change.
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.querySelector("#unity-container").className = "unity-mobile";
+        canvas.className = "unity-mobile";
+
+        // To lower canvas resolution on mobile devices to gain some
+        // performance, uncomment the following line:
+        // config.devicePixelRatio = 1;
+
+
+      } else {
+        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
+        canvas.style.width = "960px";
+        canvas.style.height = "600px";
+      }
+
+      document.querySelector("#unity-loading-bar").style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
-            document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
-            unityInstanceRef = unityInstance;
-            document.querySelector("#unity-loading-bar").style.display = "none";
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+              }).then((unityInstance) => {
+                document.querySelector("#unity-loading-bar").style.display = "none";
+                document.querySelector("#unity-fullscreen-button").onclick = () => {
+                  unityInstance.SetFullscreen(1);
+                };
 
-            document.getElementById("fullscreen-btn").onclick = () => {
-                unityInstance.SetFullscreen(1);
+              }).catch((message) => {
+                alert(message);
+              });
             };
 
-            document.getElementById("reload-btn").onclick = () => {
-                location.reload();
-            };
-        }).catch((message) => {
-            unityShowBanner(message, 'error');
-        });
-    };
+      document.body.appendChild(script);
 
-    document.body.appendChild(script);
-</script>
-</body>
+    </script>
+  </body>
 </html>
