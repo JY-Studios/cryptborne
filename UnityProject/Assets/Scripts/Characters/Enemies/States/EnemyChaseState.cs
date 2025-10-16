@@ -35,21 +35,29 @@ namespace Characters.Enemies.States
                 return;
             }
 
-            // Zum Spieler bewegen
-            Vector3 directionToPlayer = (enemy.player.position - enemy.transform.position).normalized;
-            
+            // Zum Spieler bewegen - NUR horizontal (X und Z)!
+            Vector3 directionToPlayer = enemy.player.position - enemy.transform.position;
+            directionToPlayer.y = 0f; // WICHTIG: Y ignorieren!
+            directionToPlayer.Normalize();
+
             // Separation von anderen Enemies
             Vector3 separationForce = CalculateSeparation(enemy);
+            separationForce.y = 0f; // Auch hier Y auf 0!
+
             Vector3 finalDirection = (directionToPlayer + separationForce * 0.5f).normalized;
+            finalDirection.y = 0f; // Sicherheit: Final auch Y auf 0!
 
             // Bewegung ausführen
             Vector3 movement = finalDirection * enemy.moveSpeed * Time.deltaTime;
-            
+
+            // Gravity anwenden wenn CharacterController
+            movement.y = -0.5f; // Kleine Gravity damit Enemy auf Boden bleibt
+
             if (enemy.controller != null && enemy.controller.enabled)
             {
                 enemy.controller.Move(movement);
-                
-                // Zum Spieler rotieren
+
+                // Zum Spieler rotieren - nur horizontal!
                 if (directionToPlayer.magnitude > 0.01f)
                 {
                     Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
