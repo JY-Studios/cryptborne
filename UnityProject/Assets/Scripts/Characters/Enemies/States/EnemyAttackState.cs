@@ -6,10 +6,13 @@ namespace Characters.Enemies.States
     public class EnemyAttackState : EnemyBaseState
     {
         private bool hasDealtDamage = false;
+        private float attackTimer = 0f;
+        private const float ATTACK_DURATION = 1f; // Gesamte Attack-Animation Dauer
 
         public override void Enter(EnemyStateManager enemy)
         {
             hasDealtDamage = false;
+            attackTimer = 0f;
             
             // Animation: Attack - DIREKT!
             if (enemy.animator != null)
@@ -29,6 +32,9 @@ namespace Characters.Enemies.States
                     enemy.transform.rotation = Quaternion.LookRotation(directionToPlayer);
                 }
             }
+            
+            // Setze nextAttackTime sofort
+            enemy.nextAttackTime = Time.time;
         }
 
         public override void Update(EnemyStateManager enemy)
@@ -36,32 +42,35 @@ namespace Characters.Enemies.States
             if (enemy.player == null || !enemy.health.IsAlive())
                 return;
 
+            attackTimer += Time.deltaTime;
             float distanceToPlayer = Vector3.Distance(enemy.transform.position, enemy.player.position);
 
-            // Damage bei ca. 50% der Animation austeilen
-            if (!hasDealtDamage && Time.time >= enemy.nextAttackTime + 0.3f)
+            // Damage bei ca. 30-50% der Animation austeilen
+            if (!hasDealtDamage && attackTimer >= 0.3f && attackTimer <= 0.6f)
             {
-                if (distanceToPlayer <= enemy.attackRange * 1.2f)
+                // Größerer Range-Check für WebGL
+                if (distanceToPlayer <= enemy.attackRange * 1.5f)
                 {
                     PlayerHealth playerHealth = enemy.player.GetComponent<PlayerHealth>();
                     if (playerHealth != null)
                     {
                         playerHealth.TakeDamage(enemy.attackDamage);
-                        Debug.Log($"Enemy dealt {enemy.attackDamage} damage to player!");
+                        Debug.Log($"Enemy dealt {enemy.attackDamage} damage to player! Distance: {distanceToPlayer}");
+                        hasDealtDamage = true;
                     }
                 }
-                hasDealtDamage = true;
             }
 
-            // Nach Cooldown nächsten State wählen
-            if (Time.time >= enemy.nextAttackTime + enemy.attackCooldown)
+            // Nach kompletter Animation nächsten State wählen
+            if (attackTimer >= ATTACK_DURATION)
             {
                 enemy.nextAttackTime = Time.time;
 
-                if (distanceToPlayer <= enemy.attackRange)
+                if (distanceToPlayer <= enemy.attackRange * 1.2f)
                 {
                     // Nochmal angreifen
                     hasDealtDamage = false;
+                    attackTimer = 0f;
                     
                     if (enemy.animator != null)
                     {
@@ -82,6 +91,7 @@ namespace Characters.Enemies.States
         public override void Exit(EnemyStateManager enemy)
         {
             hasDealtDamage = false;
+            attackTimer = 0f;
         }
     }
 }

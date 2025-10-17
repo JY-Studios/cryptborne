@@ -78,7 +78,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   moveSpeed: 2
   detectionRange: 20
-  attackRange: 1.5
+  attackRange: 2
   separationRadius: 1
   attackDamage: 5
   attackCooldown: 1

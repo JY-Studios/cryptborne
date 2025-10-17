@@ -20,7 +20,7 @@ namespace Characters.Enemies
         [Header("Movement")]
         public float moveSpeed = 2f;
         public float detectionRange = 8f;
-        public float attackRange = 1.5f;
+        public float attackRange = 2f;
         public float separationRadius = 1f;
 
         [Header("Combat")]
