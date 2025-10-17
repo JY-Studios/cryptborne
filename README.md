@@ -1,4 +1,4 @@
-# Dungeon Crawler
+# Cryptborne
 
 A top-down dungeon crawler game built with Unity 6 in a medieval fantasy setting.
 
