@@ -61,7 +61,6 @@ public class ModularRoomBuilder : MonoBehaviour
                 {
                     GameObject floor = Instantiate(floorPrefab, pos, Quaternion.Euler(0, Random.Range(0, 4) * 90, 0), transform);
                     SetTagRecursive(floor, "Ground");
-                    EnsureCollider(floor);
                 }
                 
                 // Props im Raum (nicht zu nah an Wänden)
@@ -80,7 +79,6 @@ public class ModularRoomBuilder : MonoBehaviour
         }
         
         // ===== WÄNDE =====
-        // Offset für die Ecken
         float wallOffset = -2f;
         
         // NORD-WAND (oben) - von x=0 bis x=24, bei z=24
@@ -122,11 +120,6 @@ public class ModularRoomBuilder : MonoBehaviour
             SetTagRecursive(corner2, "Wall");
             SetTagRecursive(corner3, "Wall");
             SetTagRecursive(corner4, "Wall");
-            
-            EnsureCollider(corner1);
-            EnsureCollider(corner2);
-            EnsureCollider(corner3);
-            EnsureCollider(corner4);
         }
         
         // NavMesh neu backen NACHDEM alles fertig ist
@@ -139,10 +132,9 @@ public class ModularRoomBuilder : MonoBehaviour
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
 
-        // Verwende klassisches NavMesh.BuildNavMesh() statt NavMeshSurface
         #if UNITY_EDITOR
-                UnityEditor.AI.NavMeshBuilder.BuildNavMesh();
-                Debug.Log("NavMesh rebuilt with all obstacles!");
+            UnityEditor.AI.NavMeshBuilder.BuildNavMesh();
+            Debug.Log("NavMesh rebuilt with all obstacles!");
         #else
             Debug.LogWarning("NavMesh baking only works in Editor!");
         #endif
@@ -150,7 +142,7 @@ public class ModularRoomBuilder : MonoBehaviour
 
     void BuildWallLine(float xPos, float zPos, int length, bool isHorizontal, bool hasDoor, float rotation)
     {
-        // +1 um bis zur Ecke zu reichen!
+        // +1 um bis zur Ecke zu reichen
         int wallCount = (length / 4) + 1;
 
         for (int i = 0; i < wallCount; i++)
@@ -166,7 +158,6 @@ public class ModularRoomBuilder : MonoBehaviour
                 {
                     GameObject door = Instantiate(wallDoorway, pos, Quaternion.Euler(0, rotation, 0), transform);
                     SetTagRecursive(door, "Wall");
-                    EnsureCollider(door);
                 }
             }
             else
@@ -175,7 +166,6 @@ public class ModularRoomBuilder : MonoBehaviour
                 {
                     GameObject wall = Instantiate(wallNormal, pos, Quaternion.Euler(0, rotation, 0), transform);
                     SetTagRecursive(wall, "Wall");
-                    EnsureCollider(wall);
 
                     // Gelegentlich Wand-Dekoration
                     if (Random.value < wallDecoDensity && (torch != null || (spawnBanners && banner != null)))
@@ -200,14 +190,13 @@ public class ModularRoomBuilder : MonoBehaviour
             float randomRotation = Random.Range(0, 4) * 90f;
             GameObject spawnedProp = Instantiate(prop, position, Quaternion.Euler(0, randomRotation, 0), transform);
             SetTagRecursive(spawnedProp, "Wall");
-            EnsureCollider(spawnedProp);
 
             // NavMesh Obstacle mit korrekten Bounds
             var obstacle = spawnedProp.AddComponent<UnityEngine.AI.NavMeshObstacle>();
             obstacle.carving = true;
             obstacle.shape = UnityEngine.AI.NavMeshObstacleShape.Box;
 
-            // Berechne Bounds aus allen Collidern
+            // Berechne Bounds aus allen Collidern (die bereits im Prefab sind!)
             Bounds combinedBounds = new Bounds(spawnedProp.transform.position, Vector3.zero);
             var colliders = spawnedProp.GetComponentsInChildren<Collider>();
 
@@ -219,8 +208,6 @@ public class ModularRoomBuilder : MonoBehaviour
             // Setze Obstacle Size basierend auf tatsächlicher Größe
             obstacle.center = spawnedProp.transform.InverseTransformPoint(combinedBounds.center);
             obstacle.size = combinedBounds.size;
-
-            Debug.Log($"Spawned {spawnedProp.name} - Obstacle size: {obstacle.size}");
         }
     }
     
@@ -277,32 +264,6 @@ public class ModularRoomBuilder : MonoBehaviour
         foreach (Transform child in obj.transform)
         {
             SetTagRecursive(child.gameObject, newTag);
-        }
-    }
-
-    void EnsureCollider(GameObject obj, bool isTrigger = false)
-    {
-        // Finde ALLE MeshFilters (auch in Children)
-        MeshFilter[] meshFilters = obj.GetComponentsInChildren<MeshFilter>();
-
-        if (meshFilters.Length > 0)
-        {
-            // Füge MeshCollider zu jedem Child mit Mesh hinzu
-            foreach (var meshFilter in meshFilters)
-            {
-                if (meshFilter.GetComponent<Collider>() == null)
-                {
-                    MeshCollider collider = meshFilter.gameObject.AddComponent<MeshCollider>();
-                    collider.convex = false;
-                    collider.isTrigger = isTrigger;
-                }
-            }
-        }
-        else if (obj.GetComponent<Collider>() == null)
-        {
-            // Fallback: BoxCollider am Parent
-            BoxCollider boxCollider = obj.AddComponent<BoxCollider>();
-            boxCollider.isTrigger = isTrigger;
         }
     }
 }
