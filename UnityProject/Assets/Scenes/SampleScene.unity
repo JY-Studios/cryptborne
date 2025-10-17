@@ -2587,17 +2587,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30a440ec1c46e48f68ebc6e3e76bfa33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ModularRoomBuilder
-  floorTile1: {fileID: 919132149155446097, guid: 16ddad8c152f947b988598d893d14b75, type: 3}
-  floorTile2: {fileID: 919132149155446097, guid: 520f45616af8c4550aca3b08572972b1, type: 3}
-  floorTile3: {fileID: 919132149155446097, guid: 395e63dbf556f4ebfa3e7618467a9893, type: 3}
-  wallNormal: {fileID: 919132149155446097, guid: 46f5618e03e4c438e95f04ee732f7b15, type: 3}
-  wallCorner: {fileID: 919132149155446097, guid: 59bda19f9d1ef4dbea7ef8eee2bd0331, type: 3}
-  wallDoorway: {fileID: 919132149155446097, guid: 5e3d244c5af3d46e8bd624fbcac83d90, type: 3}
-  barrel: {fileID: 919132149155446097, guid: 48049821883fe47fa8740943bc2d014e, type: 3}
-  crate: {fileID: 919132149155446097, guid: 2a058318a3a724b6ebe67a9f6dcee84e, type: 3}
-  pillar: {fileID: 919132149155446097, guid: 30a1cdce646924f8988b21b1ad0b3157, type: 3}
-  torch: {fileID: 919132149155446097, guid: ca293b38340bb435b9175bcc07ef8980, type: 3}
-  banner: {fileID: 919132149155446097, guid: 30e237a8599fb4c539e7e9fa6348c60f, type: 3}
+  floorTile1: {fileID: 2379756390117178338, guid: 5bfaaa1f263f448409859c6d2ad9cb60, type: 3}
+  floorTile2: {fileID: 7011529209488463575, guid: 53359be5169fe1d40861c2664e13070b, type: 3}
+  floorTile3: {fileID: 2759239261793800734, guid: 94de3252def64b54db3550def8140b66, type: 3}
+  wallNormal: {fileID: 2557335591021039335, guid: 26b2a2a7e9ab7774faae8d743585189f, type: 3}
+  wallCorner: {fileID: 195590926259675460, guid: 5197650612504494c80accf485439402, type: 3}
+  wallDoorway: {fileID: 5310781869618566778, guid: ffb2eeb26ed44fa4dae5778f524143b7, type: 3}
+  barrel: {fileID: 7099762263021427141, guid: 838496a14d1ad004292059cfbf4e7d34, type: 3}
+  crate: {fileID: 8189817190728332426, guid: fee24f14a1246724ca545623e179e51c, type: 3}
+  pillar: {fileID: 2632264503352080895, guid: ac2cc3d08ac49be46be772d80d656be6, type: 3}
+  torch: {fileID: 2037311166677434165, guid: a9a74371411c1e84eb3e898e9eff1e84, type: 3}
+  banner: {fileID: 7508594785028053915, guid: 0e45f076f89ef5a4195ae7bdd18c0562, type: 3}
   spawnBanners: 0
   northDoor: 1
   southDoor: 0
